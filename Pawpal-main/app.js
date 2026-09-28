@@ -1071,7 +1071,7 @@
     }
 
     if ((t = e.target.closest('[data-log-thread]'))) {
-      addThreadEntry('Assistant note logged', 'Off food since last night · rice and curd tonight');
+      addThreadEntry('Assistant note logged', t.getAttribute('data-log-meta') || 'Off food since last night · rice and curd tonight');
       t.disabled = true;
       t.innerHTML = '<svg width="19" height="19"><use href="#i-check"/></svg>Added to the thread';
       toast('Added to ' + esc(pet().name) + '’s care thread');
@@ -1311,18 +1311,121 @@
     }, reduced ? 0 : 1500));
   }
 
-  function doAsk() {
-    var v = $('#askInput').value.trim();
-    if (!v) return;
+
+  /* The Assistant talks to the PawPal chatbot service (api.py, POST /chat).
+     Point it elsewhere with  window.PAWPAL_CHATBOT = 'https://...'  before this script. */
+  var CHATBOT = window.PAWPAL_CHATBOT || 'http://localhost:8000';
+  var chatHistories = {}, asking = false;
+
+  function historyFor(p) {
+    var k = p.id || p.name;
+    return chatHistories[k] || (chatHistories[k] = []);
+  }
+
+  function chatScroll() {
+    var s = $('#s-assistant');
+    setTimeout(function () { s.scrollTop = s.scrollHeight; }, 60);
+  }
+
+  function addMyBubble(text) {
     var b = document.createElement('div');
     b.className = 'bubble-me';
-    b.textContent = v;
-    $('#thread-chat').insertBefore(b, $('#assistantLabel'));
+    b.textContent = text;
+    $('#thread-chat').appendChild(b);
+    return b;
+  }
+
+  function addTyping() {
+    var t = document.createElement('div');
+    t.className = 'typing';
+    t.innerHTML = '<i></i><i></i><i></i>';
+    $('#thread-chat').appendChild(t);
+    return t;
+  }
+
+  /* parts: [{label, text}]. cls: extra class. tail: optional trailing HTML. */
+  function addAnswerCard(parts, cls, tail) {
+    var card = document.createElement('div');
+    card.className = 'card answer' + (cls ? ' ' + cls : '');
+    var html = '';
+    for (var i = 0; i < parts.length; i++) {
+      html += '<div class="part" style="--d:' + i + '"><p class="eyebrow">' + esc(parts[i].label)
+        + '</p><p>' + esc(parts[i].text) + '</p></div>';
+    }
+    if (tail) { html += '<div class="part" style="--d:' + parts.length + '">' + tail + '</div>'; }
+    card.innerHTML = html;
+    $('#thread-chat').appendChild(card);
+    return card;
+  }
+
+  function showChatbotReply(r, p) {
+    if (r.type === 'urgent') {
+      var flags = (r.matched_red_flag_symptoms || []).join(', ');
+      var parts = [{ label: 'Possible emergency', text: p.name + ' may need a vet now. ' + (r.message || '') }];
+      if (flags) { parts.push({ label: 'What triggered this', text: flags }); }
+      addAnswerCard(parts, 'urgent',
+        '<button class="btn" data-go="s-emergency">Open emergency mode</button>');
+      toast('This sounds urgent. Contact a vet now.');
+    } else if (r.type === 'card') {
+      var s = r.sections || {};
+      var cp = [
+        { label: 'What it might be', text: s.what_it_might_be },
+        { label: 'What to do now', text: s.what_to_do },
+        { label: 'When to see a vet', text: s.when_to_see_vet }
+      ];
+      if (r.diet_notes) { cp.push({ label: 'Food', text: r.diet_notes }); }
+      var meta = (r.condition || 'Assistant note') + (r.matched_symptoms && r.matched_symptoms.length
+        ? ' · ' + r.matched_symptoms.join(', ') : '');
+      addAnswerCard(cp, '',
+        '<button class="btn ghost" data-log-thread="1" data-log-meta="' + esc(meta) + '">Log this in the thread</button>');
+    } else {
+      addAnswerCard([{ label: 'Assistant', text: r.message || 'Could you tell me a bit more?' }]);
+    }
+  }
+
+  function doAsk() {
+    var v = $('#askInput').value.trim();
+    if (!v || asking) return;
+    var p = pet();
+    addMyBubble(v);
     $('#askInput').value = '';
-    runAssistant(true);
-    setTimeout(function () {
-      $('#s-assistant').scrollTop = $('#s-assistant').scrollHeight;
-    }, 60);
+    var typing = addTyping();
+    chatScroll();
+
+    if (p.species !== 'dog' && p.species !== 'cat') {
+      typing.parentNode.removeChild(typing);
+      addAnswerCard([{ label: 'Assistant', text: 'The chatbot only covers dogs and cats for now. For ' + p.name + ', please check with your vet.' }]);
+      chatScroll();
+      return;
+    }
+
+    asking = true;
+    var hist = historyFor(p);
+    var sent = hist.slice();
+    hist.push({ role: 'user', content: v });
+
+    fetch(CHATBOT + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: v, species: p.species, pet_name: p.name, history: sent })
+    }).then(function (res) {
+      if (!res.ok) { throw new Error('The chatbot returned an error (' + res.status + ').'); }
+      return res.json();
+    }).then(function (r) {
+      typing.parentNode.removeChild(typing);
+      showChatbotReply(r, p);
+      hist.push({ role: 'assistant', content: r.message || r.condition || '' });
+    }).catch(function (err) {
+      typing.parentNode.removeChild(typing);
+      hist.pop();
+      var offline = err instanceof TypeError;
+      addAnswerCard([{ label: 'Assistant', text: offline
+        ? 'I could not reach the chatbot. Check that it is running at ' + CHATBOT + ', then send that again.'
+        : err.message }]);
+    }).then(function () {
+      asking = false;
+      chatScroll();
+    });
   }
 
   $('#askSend').addEventListener('click', doAsk);

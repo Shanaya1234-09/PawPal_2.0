@@ -5,6 +5,9 @@ yarn-debug.log*
 yarn-error.log*
 pawpal-chatbot-api/.env.example
 pawpal-backend/.env.example
+venv/
+__pycache__/
+.env
 # Environment variables
 .env
 .env.*

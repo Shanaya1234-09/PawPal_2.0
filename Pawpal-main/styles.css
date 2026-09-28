@@ -971,3 +971,8 @@ textarea.field{height:104px; padding:15px 18px; resize:none; line-height:21px; f
 .btn[disabled]:active{transform:none}
 
 .post.landed{animation:rise 560ms var(--ease) both}
+
+/* chatbot: emergency answer */
+.answer.urgent{border:1.5px solid var(--signal)}
+.answer.urgent .eyebrow{color:var(--signal)}
+.answer .part .btn{margin-top:4px}

@@ -20,23 +20,28 @@ function fallback(name, q) {
   if (has('vomit', 'throw up', 'threw up')) return {
     mightBe: ['Something ' + name + ' ate that did not agree', 'A mild stomach upset', 'Less often, an infection or a blockage'],
     whatToDo: ['Pause food for a few hours but leave small sips of water', 'Restart with small portions of plain boiled rice', 'Note how often it happens and what it looks like'],
-    seeVetWhen: ['More than two or three episodes in a day', 'Blood in the vomit or a swollen, tender belly', 'Lethargy, or nothing stays down for 12 hours'], urgency: 'soon' };
+    seeVetWhen: ['More than two or three episodes in a day', 'Blood in the vomit or a swollen, tender belly', 'Lethargy, or nothing stays down for 12 hours'], urgency: 'soon'
+  };
   if (has('diarrh', 'loose stool', 'loose motion')) return {
     mightBe: ['A change in food or a scavenged snack', 'Mild gut infection or parasites', 'Stress'],
     whatToDo: ['Keep water available and food bland and small', 'Avoid new treats for a few days', 'Collect a photo of the stool for the vet'],
-    seeVetWhen: ['Blood or black stool', 'It lasts beyond 24 to 48 hours', 'Weakness, fever, or refusing water'], urgency: 'soon' };
+    seeVetWhen: ['Blood or black stool', 'It lasts beyond 24 to 48 hours', 'Weakness, fever, or refusing water'], urgency: 'soon'
+  };
   if (has('not eating', 'off food', "won't eat", 'wont eat', 'appetite', 'skipping meal')) return {
     mightBe: ['A one-off upset stomach', 'Dental pain or something in the mouth', 'Early illness, or stress from a change at home'],
     whatToDo: ['Offer a small portion of a favourite plain food', 'Check gums and mouth gently for swelling or injury', 'Watch water intake and energy through the day'],
-    seeVetWhen: ['No food for more than 24 hours (12 for cats, rabbits and birds)', 'Drinking much more or much less than usual', 'Vomiting, hiding, or unusual quietness'], urgency: 'soon' };
+    seeVetWhen: ['No food for more than 24 hours (12 for cats, rabbits and birds)', 'Drinking much more or much less than usual', 'Vomiting, hiding, or unusual quietness'], urgency: 'soon'
+  };
   if (has('limp', 'scratch', 'itch', 'rash', 'paw')) return {
     mightBe: ['A minor strain, thorn or cut', 'Skin irritation or a flea or tick problem', 'An allergy flare-up'],
     whatToDo: ['Check the paws and skin for cuts, thorns and redness', 'Keep activity gentle for a day', 'Stop any new food, shampoo or cleaner that started recently'],
-    seeVetWhen: ['Not putting weight on a leg', 'Open sores, swelling or a bad smell', 'It is getting worse after two days'], urgency: 'routine' };
+    seeVetWhen: ['Not putting weight on a leg', 'Open sores, swelling or a bad smell', 'It is getting worse after two days'], urgency: 'routine'
+  };
   return {
     mightBe: ['Often something minor that passes in a day or two', 'A small change in routine, food or environment', 'Occasionally the first sign of illness'],
     whatToDo: ['Watch appetite, water, energy and toilet habits today', 'Keep ' + name + ' calm, cool and comfortable', 'Write down what you notice and when it started'],
-    seeVetWhen: ['Symptoms last more than a day or get worse', 'Refusing food or water, or unusual lethargy', 'Anything that worries you, trust that instinct'], urgency: 'routine' };
+    seeVetWhen: ['Symptoms last more than a day or get worse', 'Refusing food or water, or unusual lethargy', 'Anything that worries you, trust that instinct'], urgency: 'routine'
+  };
 }
 
 const list = (a) => Array.isArray(a) ? a.map(String).map((s) => s.slice(0, 220)).slice(0, 4) : [];
@@ -59,14 +64,49 @@ async function askModel(pet, q) {
     return out.mightBe.length && out.whatToDo.length && out.seeVetWhen.length ? out : null;
   } catch (e) { return null; }
 }
+/* Your Python chatbot (api.py). Set CHATBOT_URL=http://localhost:8000 to use it.
+   Its KB covers dogs and cats only; other species fall through to the model or script. */
+const asList = (v) => Array.isArray(v) ? list(v) : (v ? [String(v).slice(0, 400)] : []);
 
+async function askChatbot(pet, q, history) {
+  const base = process.env.CHATBOT_URL;
+  if (!base || !['dog', 'cat'].includes(pet.species)) return null;
+  try {
+    const r = await fetch(base.replace(/\/$/, '') + '/chat', {
+      method: 'POST', signal: AbortSignal.timeout(90000), headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ message: q, species: pet.species, pet_name: pet.name, history })
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d.type === 'urgent') return {
+      urgency: 'now',
+      mightBe: asList((d.possible_related_conditions || []).slice(0, 4).map((c) => 'Possibly related: ' + c)),
+      whatToDo: ['Call a vet or emergency animal hospital now.', d.message].filter(Boolean),
+      seeVetWhen: (d.matched_red_flag_symptoms || []).length ? ['Emergency signs mentioned: ' + d.matched_red_flag_symptoms.join(', ')] : [d.message]
+    };
+    if (d.type === 'card' && d.sections) return {
+      urgency: 'soon', condition: d.condition, confidence: d.confidence,
+      mightBe: asList(d.sections.what_it_might_be),
+      whatToDo: asList(d.sections.what_to_do).concat(d.diet_notes ? ['Food: ' + d.diet_notes] : []),
+      seeVetWhen: asList(d.sections.when_to_see_vet)
+    };
+    if (d.type === 'text' && d.message) return { urgency: 'routine', needsMoreInfo: true, reply: String(d.message).slice(0, 600), mightBe: [], whatToDo: [], seeVetWhen: [] };
+    return null;
+  } catch (e) { return null; }
+}
 router.post('/:id/assistant', rateLimit({ windowMs: 60e3, limit: 20, standardHeaders: true, legacyHeaders: false }), petAccess('viewer'), async (req, res) => {
   const q = str((req.body || {}).question, 'question', { max: 500 });
+  const raw = Array.isArray((req.body || {}).history) ? req.body.history : [];
+  const history = raw.slice(-12).filter((t) => t && ['user', 'assistant'].includes(t.role) && typeof t.content === 'string')
+    .map((t) => ({ role: t.role, content: t.content.slice(0, 500) }));
   const lower = q.toLowerCase();
   const flagged = RED_FLAGS.some((w) => lower.includes(w));
-  let a = await askModel(req.pet, q);
-  const source = a ? 'model' : 'script';
-  if (!a) a = fallback(req.pet.name, lower);
+
+  let source = 'chatbot', a = await askChatbot(req.pet, q, history);
+  if (!a) { source = 'model'; a = await askModel(req.pet, q); }
+  if (!a) { source = 'script'; a = fallback(req.pet.name, lower); }
+  /* a danger word beats a "tell me more" reply */
+  if (flagged && a.needsMoreInfo) { source = 'script'; a = fallback(req.pet.name, lower); }
   if (flagged) {
     a.urgency = 'now';
     a.seeVetWhen = ['Go to an open vet hospital now, this can be dangerous, and do not wait for symptoms to show'].concat(a.seeVetWhen).slice(0, 4);

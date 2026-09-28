@@ -5,7 +5,7 @@
 (function (w) {
   var BASE = w.PAWPAL_API || 'http://localhost:3000/api';
   var token = null;
-  try { token = w.localStorage.getItem('pawpal_token'); } catch (e) {}
+  try { token = w.localStorage.getItem('pawpal_token'); } catch (e) { }
 
   function req(method, path, body) {
     return fetch(BASE + path, {
@@ -17,13 +17,13 @@
       return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Request failed'); return j; });
     });
   }
-  function keep(s) { token = s.token; try { w.localStorage.setItem('pawpal_token', token); } catch (e) {} return s.user; }
+  function keep(s) { token = s.token; try { w.localStorage.setItem('pawpal_token', token); } catch (e) { } return s.user; }
   var P = function (id, tail) { return '/pets/' + id + (tail || ''); };
 
   w.PawPalAPI = {
     register: function (b) { return req('POST', '/auth/register', b).then(keep); },
     login: function (email, password) { return req('POST', '/auth/login', { email: email, password: password }).then(keep); },
-    logout: function () { token = null; try { w.localStorage.removeItem('pawpal_token'); } catch (e) {} },
+    logout: function () { token = null; try { w.localStorage.removeItem('pawpal_token'); } catch (e) { } },
     forgot: function (email) { return req('POST', '/auth/forgot', { email: email }); },
     me: function () { return req('GET', '/me'); },
     updateMe: function (b) { return req('PATCH', '/me', b); },
@@ -48,7 +48,7 @@
     community: function () { return req('GET', '/community'); },
     ask: function (body) { return req('POST', '/community', { body: body }); },
     answer: function (postId, body) { return req('POST', '/community/' + postId + '/answers', { body: body }); },
-    assistant: function (id, question) { return req('POST', P(id, '/assistant'), { question: question }); },
+    assistant: function (id, question, history) { return req('POST', P(id, '/assistant'), { question: question, history: history || [] }); },
     emergency: function (id, lat, lng) { return req('GET', P(id, '/emergency' + (lat != null ? '?lat=' + lat + '&lng=' + lng : ''))); },
     startCall: function (id, contact) { return req('POST', P(id, '/emergency/calls'), { contact: contact, shareRecords: true }); },
     endCall: function (id, cid) { return req('PATCH', P(id, '/emergency/calls/' + cid), {}); },
