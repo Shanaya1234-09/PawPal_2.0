@@ -1,0 +1,208 @@
+/* ============================================================
+   PawPal — motion
+   Screen transitions, staggered entrances, ambient loops.
+   ============================================================ */
+
+/* ---------- launch ---------- */
+
+.boot{
+  position:absolute; top:0; right:0; bottom:0; left:0; inset:0; z-index:200;
+  background:var(--bone);
+  display:grid; place-items:center;
+  transition:opacity 420ms var(--ease), transform 620ms var(--ease);
+}
+.boot .mark{
+  width:96px; height:96px; color:var(--pine);
+  animation:markIn 720ms var(--spring) both;
+}
+.boot .mark path,.boot .mark circle,.boot .mark ellipse{
+  stroke-dasharray:var(--len,90); stroke-dashoffset:var(--len,90);
+  animation:draw 620ms var(--ease) forwards;
+}
+.boot .wordmark{
+  position:absolute; bottom:calc(50% - 96px);
+  font-family:var(--display); font-size:26px; letter-spacing:-.015em;
+  font-variation-settings:"opsz" 90,"SOFT" 50,"WONK" 1;
+  opacity:0; animation:fadeUp 520ms 560ms var(--ease) forwards;
+}
+.boot.gone{opacity:0; transform:scale(1.06); pointer-events:none}
+
+@keyframes markIn{from{transform:scale(.7) rotate(-8deg); opacity:0} to{transform:none; opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadeUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+/* ---------- screen transitions ---------- */
+
+.screen.push-in{animation:pushIn var(--t-screen) var(--ease) both}
+.screen.push-out{animation:pushOut var(--t-screen) var(--ease) both}
+.screen.pop-in{animation:popInScreen var(--t-screen) var(--ease) both}
+.screen.pop-out{animation:popOut var(--t-screen) var(--ease) both}
+.screen.sheet-in{animation:sheetIn 520ms var(--ease) both}
+.screen.sheet-out{animation:sheetOut 380ms var(--ease) both}
+.screen.under-in{animation:underIn 520ms var(--ease) both}
+.screen.under-out{animation:underOut 380ms var(--ease) both}
+.screen.fade-in{animation:fadeInScreen 380ms var(--ease) both}
+.screen.fade-out{animation:fadeOutScreen 300ms var(--ease) both}
+
+@keyframes pushIn{from{transform:translateX(100%)} to{transform:none}}
+@keyframes pushOut{from{transform:none; opacity:1} to{transform:translateX(-26%); opacity:.35}}
+@keyframes popInScreen{from{transform:translateX(-26%); opacity:.35} to{transform:none; opacity:1}}
+@keyframes popOut{from{transform:none} to{transform:translateX(100%)}}
+@keyframes sheetIn{from{transform:translateY(100%)} to{transform:none}}
+@keyframes sheetOut{from{transform:none} to{transform:translateY(100%)}}
+@keyframes underIn{from{transform:scale(.93); opacity:.4; border-radius:38px} to{transform:none; opacity:1; border-radius:0}}
+@keyframes underOut{from{transform:none; border-radius:0} to{transform:scale(.93); opacity:.4; border-radius:38px}}
+@keyframes fadeInScreen{from{opacity:0; transform:scale(1.02)} to{opacity:1; transform:none}}
+@keyframes fadeOutScreen{from{opacity:1} to{opacity:0; transform:scale(.985)}}
+
+/* the red wash that opens emergency from wherever you were */
+.wash{
+  position:absolute; z-index:150; border-radius:50%; pointer-events:none;
+  background:var(--signal);
+  transform:translate(-50%,-50%) scale(0);
+  animation:wash 560ms var(--ease) forwards;
+}
+@keyframes wash{to{transform:translate(-50%,-50%) scale(1)}}
+
+/* ---------- staggered entrance ---------- */
+
+.rise{opacity:0; transform:translateY(16px); filter:blur(7px)}
+.screen.settled .rise{
+  animation:rise 620ms var(--ease) both;
+  animation-delay:calc(var(--d,0) * 62ms);
+}
+@keyframes rise{
+  from{opacity:0; transform:translateY(16px); filter:blur(7px)}
+  to{opacity:1; transform:none; filter:blur(0)}
+}
+
+/* care thread rail draws down, nodes pop after it passes */
+.screen.settled .rail{animation:railDraw 900ms 220ms var(--ease) both}
+@keyframes railDraw{from{transform:scaleY(0)} to{transform:scaleY(1)}}
+
+.screen.settled .entry .node,
+.screen.settled .vax-item .node{
+  animation:nodePop 420ms var(--spring) both;
+  animation-delay:calc(340ms + var(--d,0) * 90ms);
+}
+@keyframes nodePop{from{transform:scale(0)} to{transform:scale(1)}}
+
+.now-marker .node{animation:breathe 2.6s 1.4s infinite var(--ease)}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 0 5px rgba(35,55,43,.14)}
+  50%{box-shadow:0 0 0 11px rgba(35,55,43,.05)}
+}
+
+/* ---------- charts ---------- */
+
+.screen.settled .chart .line{
+  stroke-dasharray:var(--len,900); stroke-dashoffset:var(--len,900);
+  animation:draw 1400ms 260ms var(--ease) forwards;
+}
+.screen.settled .chart .area,
+.screen.settled .chart .band{animation:fadeSoft 900ms 620ms var(--ease) both}
+.screen.settled .chart .tipdot{animation:nodePop 500ms 1500ms var(--spring) both}
+@keyframes fadeSoft{from{opacity:0} to{opacity:var(--o,1)}}
+
+.screen.settled .donut .seg{
+  stroke-dasharray:var(--dash);
+  stroke-dashoffset:var(--len);
+  animation:draw 1000ms var(--ease) forwards;
+  animation-delay:calc(320ms + var(--d,0) * 170ms);
+}
+
+/* ---------- assistant ---------- */
+
+@keyframes blip{
+  0%,60%,100%{transform:translateY(0); opacity:.45}
+  30%{transform:translateY(-6px); opacity:1}
+}
+.answer .part{opacity:0; animation:rise 560ms var(--ease) both; animation-delay:calc(var(--d,0) * 130ms)}
+
+/* ---------- micro ---------- */
+
+@keyframes ripple{to{transform:translate(-50%,-50%) scale(1); opacity:0}}
+
+.call{animation:heartbeat 2.4s 900ms infinite var(--ease)}
+@keyframes heartbeat{
+  0%,86%,100%{transform:none; box-shadow:0 12px 30px -12px rgba(0,0,0,.4)}
+  90%{transform:scale(1.022); box-shadow:0 16px 40px -12px rgba(0,0,0,.5)}
+  94%{transform:scale(.998)}
+}
+
+.pill.alarm .beacon{animation:beacon 1.9s infinite var(--ease)}
+@keyframes beacon{
+  0%,100%{box-shadow:0 0 0 0 rgba(192,64,43,.5)}
+  70%{box-shadow:0 0 0 7px rgba(192,64,43,0)}
+}
+
+.refresh.pull{opacity:1}
+.refresh.spin svg{animation:spin 800ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.paws{animation:drift 26s linear infinite}
+@keyframes drift{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-64px,-64px,0)}
+}
+
+/* Selectors target the originals in <defs>: a <use> shadow tree clones the
+   computed style, so every drawing of the pet animates from these rules.
+   Each species has its own ear anchor, so the flop pivots where it should. */
+.pet-art .tail{transform-origin:40px 132px; animation:wag 1.5s infinite var(--ease)}
+@keyframes wag{0%,100%{transform:rotate(-9deg)} 50%{transform:rotate(13deg)}}
+
+#pup-dog .ear-l{transform-origin:110px 62px; transform:rotate(-11deg); animation:earDogL 4.2s infinite var(--ease)}
+#pup-dog .ear-r{transform-origin:196px 64px; transform:rotate(9deg); animation:earDogR 4.2s .3s infinite var(--ease)}
+@keyframes earDogL{0%,88%,100%{transform:rotate(-11deg)} 94%{transform:rotate(-19deg)}}
+@keyframes earDogR{0%,88%,100%{transform:rotate(9deg)} 94%{transform:rotate(17deg)}}
+
+#pup-cat .ear-l{transform-origin:130px 54px; animation:earTwitchL 5s infinite var(--ease)}
+#pup-cat .ear-r{transform-origin:174px 54px; animation:earTwitchR 5s .4s infinite var(--ease)}
+@keyframes earTwitchL{0%,90%,100%{transform:none} 95%{transform:rotate(-9deg)}}
+@keyframes earTwitchR{0%,90%,100%{transform:none} 95%{transform:rotate(9deg)}}
+
+#pup-rabbit .ear-l{transform-origin:128px 70px; transform:rotate(-9deg); animation:earBunL 4.6s infinite var(--ease)}
+#pup-rabbit .ear-r{transform-origin:178px 70px; transform:rotate(9deg); animation:earBunR 4.6s .5s infinite var(--ease)}
+@keyframes earBunL{0%,84%,100%{transform:rotate(-9deg)} 90%{transform:rotate(-20deg)} 95%{transform:rotate(-5deg)}}
+@keyframes earBunR{0%,84%,100%{transform:rotate(9deg)} 90%{transform:rotate(20deg)} 95%{transform:rotate(5deg)}}
+
+#pup-bird .wing{animation:flap 3.4s infinite var(--ease)}
+@keyframes flap{0%,86%,100%{transform:none} 91%{transform:rotate(-16deg)} 96%{transform:rotate(4deg)}}
+
+.pet-art .lid{animation:blink 5.4s infinite}
+@keyframes blink{0%,96%,100%{transform:scaleY(0)} 98%{transform:scaleY(1)}}
+
+.poster{animation:none}
+.screen.settled .poster{animation:flipIn 820ms 180ms var(--ease) both; transform-origin:center top}
+@keyframes flipIn{
+  from{opacity:0; transform:perspective(900px) rotateX(-14deg) translateY(-8px)}
+  to{opacity:1; transform:perspective(900px) rotateX(0) translateY(0)}
+}
+
+/* sign-in button morph */
+.btn.working{width:56px; min-width:56px; padding:0; margin:0 auto; display:flex; transition:width 380ms var(--ease)}
+.btn .spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin 700ms linear infinite}
+.btn.done{background:var(--pine)}
+
+@keyframes amountPop{from{transform:scale(.9)} to{transform:scale(1)}}
+
+/* a row that was just added by the user lands rather than appears */
+@keyframes landRow{
+  from{opacity:0; transform:translateY(-10px); background:rgba(232,163,61,.18)}
+  to{opacity:1; transform:none; background:transparent}
+}
+.row.landed,.vax-item.landed,.entry.landed{animation:landRow 620ms var(--ease) both}
+
+/* ---------- honour the setting ---------- */
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .rise{opacity:1; transform:none; filter:none}
+  .screen.settled .chart .line{stroke-dashoffset:0}
+  .screen.settled .donut .seg{stroke-dashoffset:0}
+}

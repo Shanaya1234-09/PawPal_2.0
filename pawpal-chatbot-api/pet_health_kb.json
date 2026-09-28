@@ -1,0 +1,718 @@
+[
+  {
+    "condition": "Gastroenteritis",
+    "species": "dog",
+    "symptoms": {
+      "vomiting": 3,
+      "diarrhea": 3,
+      "lethargy": 2,
+      "loss_of_appetite": 2,
+      "abdominal_pain": 1
+    },
+    "red_flags": [
+      "blood_in_vomit",
+      "blood_in_stool",
+      "severe_lethargy"
+    ],
+    "home_care": "Withhold food for 12-24h (water still available), then reintroduce a bland diet (boiled chicken and rice) in small portions.",
+    "vet_if": "Symptoms last beyond 24-48h, blood appears, or the dog is a puppy, senior, or has other health conditions.",
+    "diet_notes": "Bland, low-fat food during recovery; gradual transition back to normal diet over 3-4 days."
+  },
+  {
+    "condition": "Canine Parvovirus",
+    "species": "dog",
+    "symptoms": {
+      "vomiting": 3,
+      "diarrhea": 3,
+      "blood_in_stool": 3,
+      "lethargy": 3,
+      "loss_of_appetite": 2,
+      "fever": 2,
+      "dehydration": 2
+    },
+    "red_flags": [
+      "blood_in_stool",
+      "severe_lethargy",
+      "collapse",
+      "pale_gums"
+    ],
+    "home_care": "This is a medical emergency, especially in unvaccinated puppies - do not attempt home treatment.",
+    "vet_if": "Immediately - parvovirus is life-threatening and requires hospitalization and IV fluids.",
+    "diet_notes": "Diet is managed by the vet during recovery; bland, easily digestible food is reintroduced gradually once vomiting stops."
+  },
+  {
+    "condition": "Kennel Cough",
+    "species": "dog",
+    "symptoms": {
+      "coughing": 3,
+      "sneezing": 1,
+      "nasal_discharge": 1,
+      "lethargy": 1,
+      "loss_of_appetite": 1,
+      "fever": 1
+    },
+    "red_flags": [
+      "difficulty_breathing",
+      "blue_gums"
+    ],
+    "home_care": "Use a harness instead of a collar, rest in a humid room, and isolate from other dogs to prevent spread.",
+    "vet_if": "Cough persists over a week, worsens, or is paired with fever/lethargy/appetite loss.",
+    "diet_notes": "No special diet needed; ensure easy access to water and soft food if throat irritation reduces appetite."
+  },
+  {
+    "condition": "Ear Infection (Otitis Externa)",
+    "species": "dog",
+    "symptoms": {
+      "ear_scratching": 3,
+      "head_shaking": 3,
+      "ear_odor": 2,
+      "ear_discharge": 2,
+      "redness": 1
+    },
+    "red_flags": [
+      "head_tilt",
+      "loss_of_balance"
+    ],
+    "home_care": "Keep ears dry, avoid inserting cotton swabs into the canal, and check for foreign debris.",
+    "vet_if": "Symptoms persist beyond a few days, there's a strong odor/discharge, or the dog shows head tilt or balance issues.",
+    "diet_notes": "If allergy-related, an elimination diet trial (limited-ingredient or novel-protein food) may help identify triggers."
+  },
+  {
+    "condition": "Atopic Dermatitis (Skin Allergies)",
+    "species": "dog",
+    "symptoms": {
+      "itching": 3,
+      "redness": 2,
+      "hair_loss": 2,
+      "skin_rash": 2,
+      "chewing_paws": 2
+    },
+    "red_flags": [
+      "open_sores",
+      "severe_swelling"
+    ],
+    "home_care": "Regular bathing with a gentle/hypoallergenic shampoo and reducing exposure to known irritants.",
+    "vet_if": "Itching is constant, skin becomes broken/infected, or there's no improvement with basic care.",
+    "diet_notes": "Limited-ingredient or hydrolyzed-protein diet trial can help rule out food allergies as a cause."
+  },
+  {
+    "condition": "Flea Allergy Dermatitis",
+    "species": "dog",
+    "symptoms": {
+      "itching": 3,
+      "hair_loss": 2,
+      "skin_rash": 2,
+      "chewing_paws": 1,
+      "redness": 1
+    },
+    "red_flags": [
+      "open_sores",
+      "severe_swelling"
+    ],
+    "home_care": "Use a vet-approved flea preventative and treat the home environment (bedding, carpets) for fleas.",
+    "vet_if": "Skin is broken or infected, or the itching persists despite flea control.",
+    "diet_notes": "No specific diet link; ensure overall coat/skin health with adequate omega-3 fatty acid intake."
+  },
+  {
+    "condition": "Urinary Tract Infection",
+    "species": "dog",
+    "symptoms": {
+      "frequent_urination": 3,
+      "straining_to_urinate": 3,
+      "blood_in_urine": 2,
+      "licking_genitals": 2,
+      "accidents_indoors": 1
+    },
+    "red_flags": [
+      "unable_to_urinate",
+      "severe_lethargy"
+    ],
+    "home_care": "Encourage water intake to dilute urine; do not delay care if straining is present.",
+    "vet_if": "Straining with little/no urine output (possible blockage - urgent), or blood in urine.",
+    "diet_notes": "Urinary-support diets (controlled mineral content) may be recommended long-term if UTIs recur."
+  },
+  {
+    "condition": "Bloat (Gastric Dilatation-Volvulus)",
+    "species": "dog",
+    "symptoms": {
+      "distended_abdomen": 3,
+      "retching_without_vomit": 3,
+      "restlessness": 2,
+      "drooling": 2,
+      "abdominal_pain": 2
+    },
+    "red_flags": [
+      "distended_abdomen",
+      "retching_without_vomit",
+      "collapse",
+      "pale_gums"
+    ],
+    "home_care": "None - this is a life-threatening emergency requiring immediate veterinary surgery.",
+    "vet_if": "Immediately, this cannot wait - bloat can be fatal within hours.",
+    "diet_notes": "Prevention: feed smaller, multiple meals rather than one large meal, and avoid vigorous exercise right after eating."
+  },
+  {
+    "condition": "Osteoarthritis",
+    "species": "dog",
+    "symptoms": {
+      "limping": 3,
+      "stiffness": 3,
+      "reluctance_to_jump": 2,
+      "lethargy": 1,
+      "muscle_loss": 1
+    },
+    "red_flags": [
+      "sudden_inability_to_walk",
+      "severe_pain"
+    ],
+    "home_care": "Provide soft bedding, moderate low-impact exercise, and weight management to reduce joint stress.",
+    "vet_if": "Pain worsens, mobility declines quickly, or over-the-counter relief isn't helping (never give human painkillers).",
+    "diet_notes": "Joint-support diets with glucosamine/chondroitin and omega-3s; keep weight in the ideal range to reduce joint load."
+  },
+  {
+    "condition": "Hypothyroidism",
+    "species": "dog",
+    "symptoms": {
+      "weight_gain": 3,
+      "lethargy": 2,
+      "hair_loss": 2,
+      "cold_intolerance": 2,
+      "dull_coat": 1
+    },
+    "red_flags": [],
+    "home_care": "Not manageable at home alone; requires diagnosis and lifelong medication from a vet.",
+    "vet_if": "Persistent unexplained weight gain, lethargy, or coat changes.",
+    "diet_notes": "Calorie-controlled diet to manage weight gain, alongside prescribed thyroid medication."
+  },
+  {
+    "condition": "Diabetes Mellitus",
+    "species": "dog",
+    "symptoms": {
+      "increased_thirst": 3,
+      "frequent_urination": 3,
+      "weight_loss": 2,
+      "increased_appetite": 2,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "collapse"
+    ],
+    "home_care": "Not manageable without veterinary diagnosis; requires blood glucose monitoring and likely insulin.",
+    "vet_if": "Any combination of increased thirst/urination with weight loss despite normal or increased appetite.",
+    "diet_notes": "Consistent, high-fiber, controlled-carbohydrate diet fed on a fixed schedule aligned with insulin dosing."
+  },
+  {
+    "condition": "Chronic Kidney Disease",
+    "species": "dog",
+    "symptoms": {
+      "increased_thirst": 3,
+      "frequent_urination": 2,
+      "weight_loss": 2,
+      "loss_of_appetite": 2,
+      "vomiting": 1,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "collapse",
+      "not_eating_at_all"
+    ],
+    "home_care": "Ensure constant access to fresh water; avoid high-sodium treats.",
+    "vet_if": "Persistent increased thirst/urination, weight loss, or appetite decline in middle-aged/senior dogs.",
+    "diet_notes": "Prescription renal diet: reduced phosphorus and controlled, high-quality protein."
+  },
+  {
+    "condition": "Pancreatitis",
+    "species": "dog",
+    "symptoms": {
+      "vomiting": 3,
+      "abdominal_pain": 3,
+      "loss_of_appetite": 2,
+      "lethargy": 2,
+      "diarrhea": 1,
+      "hunched_posture": 2
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "collapse"
+    ],
+    "home_care": "Withhold fatty foods and table scraps immediately; do not attempt to treat without vet guidance.",
+    "vet_if": "Vomiting combined with abdominal pain and hunched posture, especially after a fatty meal.",
+    "diet_notes": "Low-fat prescription diet during and after recovery; strictly avoid fatty table scraps long-term."
+  },
+  {
+    "condition": "Heartworm Disease",
+    "species": "dog",
+    "symptoms": {
+      "coughing": 2,
+      "lethargy": 2,
+      "exercise_intolerance": 3,
+      "weight_loss": 1,
+      "difficulty_breathing": 2
+    },
+    "red_flags": [
+      "difficulty_breathing",
+      "collapse",
+      "pale_gums"
+    ],
+    "home_care": "Restrict exercise if diagnosed - exertion increases risk of complications during treatment.",
+    "vet_if": "Persistent cough with reduced stamina, especially if heartworm prevention has lapsed.",
+    "diet_notes": "No special diet; focus is on monthly preventatives and following the vet's treatment/exercise-restriction plan."
+  },
+  {
+    "condition": "Conjunctivitis",
+    "species": "dog",
+    "symptoms": {
+      "eye_discharge": 3,
+      "redness": 2,
+      "squinting": 2,
+      "eye_swelling": 1
+    },
+    "red_flags": [
+      "cloudy_eye",
+      "sudden_vision_loss"
+    ],
+    "home_care": "Gently wipe discharge with a clean, damp cloth; prevent scratching with an e-collar if needed.",
+    "vet_if": "Discharge is thick/colored, symptoms persist beyond a couple days, or the eye looks cloudy/painful.",
+    "diet_notes": "No specific diet link."
+  },
+  {
+    "condition": "Periodontal (Dental) Disease",
+    "species": "dog",
+    "symptoms": {
+      "bad_breath": 3,
+      "difficulty_eating": 2,
+      "drooling": 1,
+      "loose_teeth": 2,
+      "red_gums": 2
+    },
+    "red_flags": [
+      "facial_swelling",
+      "not_eating_at_all"
+    ],
+    "home_care": "Regular tooth brushing and dental chews; avoid very hard chew toys that can crack teeth.",
+    "vet_if": "Bad breath with visible tartar/red gums, or difficulty eating - professional cleaning may be needed.",
+    "diet_notes": "Dental-formula kibble can help reduce plaque buildup; softer food temporarily if eating is painful."
+  },
+  {
+    "condition": "Obesity",
+    "species": "dog",
+    "symptoms": {
+      "weight_gain": 3,
+      "reduced_stamina": 2,
+      "difficulty_breathing": 1,
+      "reluctance_to_jump": 1
+    },
+    "red_flags": [],
+    "home_care": "Gradually increase exercise and portion-control meals; avoid free-feeding.",
+    "vet_if": "To rule out underlying causes (thyroid, etc.) and get a tailored weight-loss plan.",
+    "diet_notes": "Calorie-controlled, high-fiber/high-protein weight-management food; measured portions, minimal treats."
+  },
+  {
+    "condition": "Lyme Disease",
+    "species": "dog",
+    "symptoms": {
+      "limping": 3,
+      "lethargy": 2,
+      "fever": 2,
+      "swollen_joints": 2,
+      "loss_of_appetite": 1
+    },
+    "red_flags": [
+      "difficulty_breathing",
+      "severe_lethargy"
+    ],
+    "home_care": "Check for and safely remove attached ticks; use vet-recommended tick prevention.",
+    "vet_if": "Shifting limb lameness with fever, especially after known tick exposure.",
+    "diet_notes": "No special diet; focus on preventative tick control."
+  },
+  {
+    "condition": "Hip Dysplasia",
+    "species": "dog",
+    "symptoms": {
+      "limping": 2,
+      "difficulty_rising": 3,
+      "reluctance_to_jump": 2,
+      "reduced_stamina": 2,
+      "muscle_loss": 1
+    },
+    "red_flags": [
+      "sudden_inability_to_walk"
+    ],
+    "home_care": "Low-impact exercise (swimming), soft bedding, and ramps instead of stairs.",
+    "vet_if": "Progressive difficulty rising or walking, particularly in large-breed dogs.",
+    "diet_notes": "Weight management is critical; joint-support diet with glucosamine/chondroitin."
+  },
+  {
+    "condition": "Anal Gland Impaction",
+    "species": "dog",
+    "symptoms": {
+      "scooting": 3,
+      "licking_rear": 2,
+      "foul_odor": 2,
+      "discomfort_sitting": 1
+    },
+    "red_flags": [
+      "swelling_near_tail",
+      "bleeding"
+    ],
+    "home_care": "Vet or groomer can manually express the glands; avoid attempting this without guidance.",
+    "vet_if": "Recurrent scooting, swelling, or discharge/bleeding near the tail base.",
+    "diet_notes": "Higher-fiber diet can help produce firmer stools that naturally express the glands."
+  },
+  {
+    "condition": "Feline Upper Respiratory Infection",
+    "species": "cat",
+    "symptoms": {
+      "sneezing": 3,
+      "nasal_discharge": 3,
+      "eye_discharge": 2,
+      "coughing": 1,
+      "loss_of_appetite": 2,
+      "fever": 1
+    },
+    "red_flags": [
+      "difficulty_breathing",
+      "not_eating_at_all"
+    ],
+    "home_care": "Wipe discharge gently, use a humidifier, and warm up food slightly to make it more appealing.",
+    "vet_if": "Symptoms persist beyond a week, breathing becomes labored, or the cat stops eating entirely.",
+    "diet_notes": "Warmed, aromatic wet food can encourage eating when smell/appetite is reduced by congestion."
+  },
+  {
+    "condition": "Feline Lower Urinary Tract Disease (FLUTD)",
+    "species": "cat",
+    "symptoms": {
+      "frequent_urination": 3,
+      "straining_to_urinate": 3,
+      "blood_in_urine": 2,
+      "urinating_outside_litterbox": 2,
+      "licking_genitals": 1
+    },
+    "red_flags": [
+      "unable_to_urinate",
+      "vocalizing_in_pain"
+    ],
+    "home_care": "Encourage water intake, provide clean litter boxes, and reduce stress in the home.",
+    "vet_if": "Straining with little/no urine (urgent - possible blockage, especially in male cats) or visible blood.",
+    "diet_notes": "Urinary-support wet food (higher moisture, controlled mineral content) to promote dilute urine."
+  },
+  {
+    "condition": "Hyperthyroidism",
+    "species": "cat",
+    "symptoms": {
+      "weight_loss": 3,
+      "increased_appetite": 3,
+      "hyperactivity": 2,
+      "vomiting": 1,
+      "increased_thirst": 1,
+      "unkempt_coat": 1
+    },
+    "red_flags": [
+      "rapid_heart_rate",
+      "severe_lethargy"
+    ],
+    "home_care": "Not manageable at home alone; requires blood testing and ongoing treatment (medication, diet, or other therapy).",
+    "vet_if": "Weight loss despite a ravenous appetite, especially in middle-aged to senior cats.",
+    "diet_notes": "Prescription iodine-restricted diet is one treatment option, alongside or instead of medication."
+  },
+  {
+    "condition": "Chronic Kidney Disease (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "increased_thirst": 3,
+      "frequent_urination": 2,
+      "weight_loss": 2,
+      "loss_of_appetite": 2,
+      "vomiting": 1,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "not_eating_at_all"
+    ],
+    "home_care": "Provide multiple fresh water sources; consider wet food to increase hydration.",
+    "vet_if": "Increased thirst/urination with weight loss, common in senior cats.",
+    "diet_notes": "Prescription renal diet: reduced phosphorus, controlled high-quality protein, high moisture content."
+  },
+  {
+    "condition": "Diabetes Mellitus (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "increased_thirst": 3,
+      "frequent_urination": 3,
+      "weight_loss": 2,
+      "increased_appetite": 2,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "wobbly_hind_legs"
+    ],
+    "home_care": "Not manageable without vet diagnosis; requires monitoring and typically insulin.",
+    "vet_if": "Increased thirst/urination with weight loss, especially in overweight or older cats.",
+    "diet_notes": "High-protein, low-carbohydrate diet fed consistently, aligned with insulin schedule if prescribed."
+  },
+  {
+    "condition": "Hairballs (Trichobezoars)",
+    "species": "cat",
+    "symptoms": {
+      "occasional_vomiting": 3,
+      "coughing": 2,
+      "gagging": 2,
+      "constipation": 1
+    },
+    "red_flags": [
+      "not_eating_at_all",
+      "repeated_unproductive_vomiting"
+    ],
+    "home_care": "Regular brushing to reduce loose fur ingestion; hairball-control treats in moderation.",
+    "vet_if": "Frequent vomiting, or retching without producing a hairball (possible blockage).",
+    "diet_notes": "Hairball-control formula food (added fiber) helps fur pass through the digestive tract naturally."
+  },
+  {
+    "condition": "Feline Panleukopenia",
+    "species": "cat",
+    "symptoms": {
+      "vomiting": 3,
+      "diarrhea": 3,
+      "lethargy": 3,
+      "loss_of_appetite": 2,
+      "fever": 2,
+      "dehydration": 2
+    },
+    "red_flags": [
+      "blood_in_stool",
+      "severe_lethargy",
+      "collapse"
+    ],
+    "home_care": "This is a medical emergency, especially in unvaccinated kittens - do not attempt home treatment.",
+    "vet_if": "Immediately - this is often fatal without prompt veterinary care.",
+    "diet_notes": "Diet is managed by the vet during recovery; bland food reintroduced gradually once stable."
+  },
+  {
+    "condition": "Ear Mites",
+    "species": "cat",
+    "symptoms": {
+      "ear_scratching": 3,
+      "head_shaking": 2,
+      "dark_ear_debris": 3,
+      "ear_odor": 1
+    },
+    "red_flags": [
+      "head_tilt",
+      "loss_of_balance"
+    ],
+    "home_care": "Keep ears clean; avoid sharing bedding between pets until treated to prevent spread.",
+    "vet_if": "Persistent scratching with dark, coffee-ground-like debris in the ears.",
+    "diet_notes": "No specific diet link."
+  },
+  {
+    "condition": "Flea Allergy Dermatitis (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "itching": 3,
+      "hair_loss": 2,
+      "scabbing": 2,
+      "overgrooming": 2
+    },
+    "red_flags": [
+      "open_sores"
+    ],
+    "home_care": "Use a vet-approved flea preventative and treat the home environment for fleas.",
+    "vet_if": "Skin becomes broken/infected or itching persists despite flea control.",
+    "diet_notes": "No specific diet link; adequate omega-3 intake supports skin/coat health."
+  },
+  {
+    "condition": "Dental Disease / Gingivitis",
+    "species": "cat",
+    "symptoms": {
+      "bad_breath": 3,
+      "difficulty_eating": 2,
+      "drooling": 1,
+      "red_gums": 2,
+      "pawing_at_mouth": 1
+    },
+    "red_flags": [
+      "not_eating_at_all",
+      "facial_swelling"
+    ],
+    "home_care": "Tooth brushing if tolerated, and dental-formula treats; monitor eating for signs of pain.",
+    "vet_if": "Bad breath with visible red/inflamed gums, or reluctance to eat.",
+    "diet_notes": "Softer wet food temporarily if chewing is painful; dental kibble for long-term plaque control."
+  },
+  {
+    "condition": "Constipation",
+    "species": "cat",
+    "symptoms": {
+      "straining_in_litterbox": 3,
+      "infrequent_defecation": 3,
+      "small_hard_stools": 2,
+      "vomiting": 1,
+      "loss_of_appetite": 1
+    },
+    "red_flags": [
+      "no_defecation_for_days",
+      "severe_lethargy"
+    ],
+    "home_care": "Increase water intake (wet food, water fountains) and ensure adequate exercise.",
+    "vet_if": "No stool for 48+ hours, or repeated straining without result.",
+    "diet_notes": "High-fiber or wet food to soften stool; ensure good hydration overall."
+  },
+  {
+    "condition": "Feline Asthma",
+    "species": "cat",
+    "symptoms": {
+      "coughing": 3,
+      "wheezing": 3,
+      "difficulty_breathing": 2,
+      "open_mouth_breathing": 2,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "difficulty_breathing",
+      "open_mouth_breathing",
+      "blue_gums"
+    ],
+    "home_care": "Reduce airborne irritants (smoke, dust, strong sprays) in the home.",
+    "vet_if": "Any breathing difficulty is urgent - open-mouth breathing in cats is always a red flag.",
+    "diet_notes": "Weight management if overweight, as excess weight worsens respiratory strain."
+  },
+  {
+    "condition": "Conjunctivitis (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "eye_discharge": 3,
+      "redness": 2,
+      "squinting": 2,
+      "eye_swelling": 1
+    },
+    "red_flags": [
+      "cloudy_eye",
+      "sudden_vision_loss"
+    ],
+    "home_care": "Gently wipe discharge with a clean, damp cloth; prevent scratching with an e-collar if needed.",
+    "vet_if": "Discharge is thick/colored, persists beyond a couple days, or the eye looks cloudy/painful.",
+    "diet_notes": "No specific diet link."
+  },
+  {
+    "condition": "Obesity (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "weight_gain": 3,
+      "reduced_activity": 2,
+      "difficulty_grooming": 1,
+      "reluctance_to_jump": 1
+    },
+    "red_flags": [],
+    "home_care": "Portion-controlled meals, interactive play/toys, and avoiding free-feeding.",
+    "vet_if": "To rule out underlying causes and get a tailored weight-loss plan.",
+    "diet_notes": "Calorie-controlled, high-protein weight-management food; measured portions, minimal treats."
+  },
+  {
+    "condition": "Inflammatory Bowel Disease",
+    "species": "cat",
+    "symptoms": {
+      "chronic_vomiting": 3,
+      "chronic_diarrhea": 3,
+      "weight_loss": 2,
+      "loss_of_appetite": 1,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "blood_in_stool",
+      "severe_lethargy",
+      "not_eating_at_all"
+    ],
+    "home_care": "Not manageable at home alone; requires vet diagnosis to rule out other causes first.",
+    "vet_if": "Vomiting or diarrhea that is recurring/chronic rather than a one-off episode.",
+    "diet_notes": "Novel-protein or hydrolyzed-protein prescription diet is often part of long-term management."
+  },
+  {
+    "condition": "Ringworm",
+    "species": "cat",
+    "symptoms": {
+      "hair_loss": 3,
+      "circular_bald_patches": 3,
+      "scaly_skin": 2,
+      "itching": 1
+    },
+    "red_flags": [],
+    "home_care": "Isolate from other pets/people (it's contagious) and disinfect shared surfaces/bedding.",
+    "vet_if": "Any suspected ringworm, since it's zoonotic (can spread to humans) and needs confirmed diagnosis.",
+    "diet_notes": "No specific diet link; general skin/coat-supporting nutrition (omega-3s) can aid recovery."
+  },
+  {
+    "condition": "Feline Immunodeficiency Virus (FIV)",
+    "species": "cat",
+    "symptoms": {
+      "recurrent_infections": 3,
+      "weight_loss": 2,
+      "poor_coat_condition": 2,
+      "swollen_lymph_nodes": 2,
+      "lethargy": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "not_eating_at_all"
+    ],
+    "home_care": "Keep as an indoor-only cat to reduce exposure to infections and prevent spreading to other cats.",
+    "vet_if": "Recurring infections or unexplained weight loss - testing is needed for diagnosis.",
+    "diet_notes": "High-quality, easily digestible diet to support a compromised immune system; avoid raw food due to infection risk."
+  },
+  {
+    "condition": "Feline Leukemia Virus (FeLV)",
+    "species": "cat",
+    "symptoms": {
+      "weight_loss": 2,
+      "poor_coat_condition": 2,
+      "recurrent_infections": 2,
+      "pale_gums": 2,
+      "lethargy": 2
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "pale_gums",
+      "not_eating_at_all"
+    ],
+    "home_care": "Keep as an indoor-only cat to prevent spreading the virus to other cats.",
+    "vet_if": "Any of these symptoms in combination - testing is needed for diagnosis and management planning.",
+    "diet_notes": "High-quality, easily digestible diet to support a compromised immune system; avoid raw food due to infection risk."
+  },
+  {
+    "condition": "Pancreatitis (Cat)",
+    "species": "cat",
+    "symptoms": {
+      "loss_of_appetite": 3,
+      "lethargy": 2,
+      "vomiting": 2,
+      "abdominal_pain": 1,
+      "dehydration": 1
+    },
+    "red_flags": [
+      "severe_lethargy",
+      "not_eating_at_all"
+    ],
+    "home_care": "Do not withhold food for long periods in cats (unlike dogs) - prolonged fasting can be harmful; consult a vet.",
+    "vet_if": "Appetite loss lasting more than a day, especially with vomiting or lethargy.",
+    "diet_notes": "Low-fat, easily digestible prescription diet; small frequent meals during recovery."
+  },
+  {
+    "condition": "Stress-Induced Cystitis",
+    "species": "cat",
+    "symptoms": {
+      "frequent_urination": 2,
+      "straining_to_urinate": 2,
+      "urinating_outside_litterbox": 3,
+      "vocalizing_in_pain": 1,
+      "overgrooming_genitals": 1
+    },
+    "red_flags": [
+      "unable_to_urinate"
+    ],
+    "home_care": "Reduce environmental stressors, provide multiple litter boxes, and enrich the home environment.",
+    "vet_if": "To rule out infection/blockage first, since symptoms overlap with FLUTD/UTI.",
+    "diet_notes": "Wet food to increase water intake; consistent routine and feeding schedule to reduce stress."
+  }
+]

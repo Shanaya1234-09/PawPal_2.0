@@ -1,0 +1,2203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PawPal</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="motion.css" />
+  </head>
+  <body>
+    <!-- ============ icon sprite + shared defs ============ -->
+    <svg
+      aria-hidden="true"
+      style="position: absolute; width: 0; height: 0; overflow: hidden"
+    >
+      <defs>
+        <linearGradient id="fadeGreen" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#23372B" stop-opacity=".14" />
+          <stop offset="100%" stop-color="#23372B" stop-opacity="0" />
+        </linearGradient>
+        <pattern
+          id="pawpat"
+          width="72"
+          height="72"
+          patternUnits="userSpaceOnUse"
+        >
+          <g fill="currentColor">
+            <ellipse cx="18" cy="22" rx="5.2" ry="6.4" />
+            <ellipse cx="30" cy="16" rx="4.4" ry="5.6" />
+            <ellipse cx="42" cy="19" rx="4.4" ry="5.6" />
+            <ellipse cx="52" cy="27" rx="4.6" ry="5.8" />
+            <path d="M22 38c0-8 8-12 14-12s14 4 14 12-6 12-14 12-14-4-14-12z" />
+          </g>
+        </pattern>
+
+        <!-- Four animals on one skeleton: same body, head, eyes and tail anchor, so a
+       single set of animation rules drives whichever species the owner picked. -->
+        <g id="pup-dog" class="pet-art">
+          <path
+            class="tail"
+            d="M40 132C20 122 14 100 24 84"
+            fill="none"
+            stroke="#C08E7D"
+            stroke-width="11"
+            stroke-linecap="round"
+          />
+          <ellipse cx="110" cy="150" rx="72" ry="44" fill="#D9AFA1" />
+          <ellipse cx="104" cy="166" rx="30" ry="26" fill="#F3E4DD" />
+          <ellipse
+            class="ear-l"
+            cx="110"
+            cy="92"
+            rx="16"
+            ry="36"
+            fill="#B37F6E"
+          />
+          <ellipse
+            class="ear-r"
+            cx="196"
+            cy="94"
+            rx="16"
+            ry="36"
+            fill="#B37F6E"
+          />
+          <circle cx="152" cy="90" r="48" fill="#D9AFA1" />
+          <ellipse cx="152" cy="116" rx="25" ry="18" fill="#F3E4DD" />
+          <circle cx="136" cy="84" r="5" fill="#4A342C" />
+          <circle cx="170" cy="84" r="5" fill="#4A342C" />
+          <rect
+            class="lid"
+            x="130"
+            y="78"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#D9AFA1"
+            style="transform-origin: 136px 78px"
+          />
+          <rect
+            class="lid"
+            x="164"
+            y="78"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#D9AFA1"
+            style="transform-origin: 170px 78px"
+          />
+          <ellipse cx="152" cy="108" rx="8" ry="5.6" fill="#4A342C" />
+          <path
+            d="M152 114v5M152 119c-3.5 3.5-9 2.5-10-1M152 119c3.5 3.5 9 2.5 10-1"
+            stroke="#4A342C"
+            stroke-width="2.4"
+            fill="none"
+            stroke-linecap="round"
+          />
+        </g>
+
+        <g id="pup-cat" class="pet-art">
+          <path
+            class="tail"
+            d="M40 132C14 126 6 96 26 78 38 67 52 74 50 86"
+            fill="none"
+            stroke="#B8ADA0"
+            stroke-width="10"
+            stroke-linecap="round"
+          />
+          <ellipse cx="110" cy="150" rx="70" ry="43" fill="#CFC5B7" />
+          <ellipse cx="104" cy="166" rx="28" ry="24" fill="#F1EDE5" />
+          <g class="ear-l">
+            <path d="M116 62 106 16 148 42Z" fill="#B8ADA0" />
+            <path d="M120 58 114 30 138 45Z" fill="#E8C9C0" />
+          </g>
+          <g class="ear-r">
+            <path d="M188 62 198 16 156 42Z" fill="#B8ADA0" />
+            <path d="M184 58 190 30 166 45Z" fill="#E8C9C0" />
+          </g>
+          <circle cx="152" cy="90" r="46" fill="#CFC5B7" />
+          <ellipse cx="152" cy="114" rx="22" ry="15" fill="#F1EDE5" />
+          <ellipse cx="136" cy="84" rx="4.6" ry="6.4" fill="#3E4A3C" />
+          <ellipse cx="170" cy="84" rx="4.6" ry="6.4" fill="#3E4A3C" />
+          <rect
+            class="lid"
+            x="130"
+            y="76"
+            width="12"
+            height="12"
+            rx="5"
+            fill="#CFC5B7"
+            style="transform-origin: 136px 76px"
+          />
+          <rect
+            class="lid"
+            x="164"
+            y="76"
+            width="12"
+            height="12"
+            rx="5"
+            fill="#CFC5B7"
+            style="transform-origin: 170px 76px"
+          />
+          <path d="M145 106h14l-7 7Z" fill="#D08C86" />
+          <path
+            d="M152 113v5M152 118c-3 3-8 2-9-1M152 118c3 3 8 2 9-1"
+            stroke="#3E4A3C"
+            stroke-width="2.2"
+            fill="none"
+            stroke-linecap="round"
+          />
+          <path
+            d="M126 104 100 99M126 110 101 112M178 104 204 99M178 110 203 112"
+            stroke="#8C8272"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </g>
+
+        <g id="pup-rabbit" class="pet-art">
+          <circle class="tail" cx="42" cy="140" r="15" fill="#F1E7E2" />
+          <ellipse cx="112" cy="152" rx="66" ry="42" fill="#D8CBC6" />
+          <ellipse cx="106" cy="166" rx="26" ry="23" fill="#F5EEEB" />
+          <g class="ear-l">
+            <ellipse cx="128" cy="30" rx="13" ry="44" fill="#D8CBC6" />
+            <ellipse cx="128" cy="34" rx="6.5" ry="34" fill="#EBC8C2" />
+          </g>
+          <g class="ear-r">
+            <ellipse cx="178" cy="30" rx="13" ry="44" fill="#D8CBC6" />
+            <ellipse cx="178" cy="34" rx="6.5" ry="34" fill="#EBC8C2" />
+          </g>
+          <circle cx="152" cy="96" r="44" fill="#D8CBC6" />
+          <ellipse cx="152" cy="118" rx="21" ry="14" fill="#F5EEEB" />
+          <circle cx="137" cy="90" r="5" fill="#4A3C3C" />
+          <circle cx="168" cy="90" r="5" fill="#4A3C3C" />
+          <rect
+            class="lid"
+            x="131"
+            y="84"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#D8CBC6"
+            style="transform-origin: 137px 84px"
+          />
+          <rect
+            class="lid"
+            x="162"
+            y="84"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#D8CBC6"
+            style="transform-origin: 168px 84px"
+          />
+          <path d="M146 110h13l-6.5 6Z" fill="#C98A86" />
+          <path
+            d="M152 116v4M152 120c-3 3-8 2-9-1M152 120c3 3 8 2 9-1"
+            stroke="#4A3C3C"
+            stroke-width="2.2"
+            fill="none"
+            stroke-linecap="round"
+          />
+          <path
+            d="M148 126h9"
+            stroke="#C98A86"
+            stroke-width="2.4"
+            stroke-linecap="round"
+          />
+        </g>
+
+        <g id="pup-bird" class="pet-art">
+          <path
+            class="tail"
+            d="M46 138C24 148 12 168 16 182 30 180 44 168 52 154"
+            fill="#A8B79F"
+          />
+          <ellipse cx="118" cy="140" rx="62" ry="52" fill="#BCCBB2" />
+          <ellipse cx="112" cy="156" rx="26" ry="28" fill="#EFF3EA" />
+          <path
+            class="wing"
+            d="M96 118C74 122 62 142 70 162 84 158 96 142 100 126Z"
+            fill="#A8B79F"
+            style="transform-origin: 98px 120px"
+          />
+          <circle cx="152" cy="84" r="42" fill="#BCCBB2" />
+          <circle cx="139" cy="78" r="5" fill="#37402F" />
+          <circle cx="170" cy="78" r="5" fill="#37402F" />
+          <rect
+            class="lid"
+            x="133"
+            y="72"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#BCCBB2"
+            style="transform-origin: 139px 72px"
+          />
+          <rect
+            class="lid"
+            x="164"
+            y="72"
+            width="12"
+            height="11"
+            rx="5"
+            fill="#BCCBB2"
+            style="transform-origin: 170px 72px"
+          />
+          <path d="M150 92 186 100 150 110Z" fill="#E8A33D" />
+          <path
+            d="M138 44c4-12 18-16 26-10"
+            stroke="#A8B79F"
+            stroke-width="7"
+            fill="none"
+            stroke-linecap="round"
+          />
+          <path
+            d="M124 186h16M148 186h16"
+            stroke="#E8A33D"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+        </g>
+
+        <g
+          id="i-home"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M3.6 10.3 12 3.6l8.4 6.7V20a1 1 0 0 1-1 1h-5v-6h-4.8v6h-5a1 1 0 0 1-1-1z"
+          />
+        </g>
+        <g
+          id="i-heart"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M12 20.3s-7.7-4.6-7.7-9.9a4.4 4.4 0 0 1 7.7-2.9 4.4 4.4 0 0 1 7.7 2.9c0 5.3-7.7 9.9-7.7 9.9z"
+          />
+        </g>
+        <g
+          id="i-chat"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M20.4 15.2a1.8 1.8 0 0 1-1.8 1.8H7.8L4.2 20.6V5.4a1.8 1.8 0 0 1 1.8-1.8h12.6a1.8 1.8 0 0 1 1.8 1.8z"
+          />
+        </g>
+        <g
+          id="i-person"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M19 20.5v-1.8a4.6 4.6 0 0 0-4.6-4.6H9.6A4.6 4.6 0 0 0 5 18.7v1.8"
+          />
+          <circle cx="12" cy="7.6" r="4" />
+        </g>
+        <g
+          id="i-back"
+          stroke="currentColor"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 5 8 12l7 7" />
+        </g>
+        <g
+          id="i-chev"
+          stroke="currentColor"
+          stroke-width="1.8"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 5l7 7-7 7" />
+        </g>
+        <g id="i-phone" fill="currentColor">
+          <path
+            d="M6.6 3.2a1.6 1.6 0 0 1 2.2.5l1.7 2.7a1.6 1.6 0 0 1-.3 2.1l-1.3 1a11 11 0 0 0 5.6 5.6l1-1.3a1.6 1.6 0 0 1 2.1-.3l2.7 1.7a1.6 1.6 0 0 1 .5 2.2l-1.1 1.7a2.6 2.6 0 0 1-2.9 1.1C11.5 18.8 5.2 12.5 3.7 6.3a2.6 2.6 0 0 1 1.1-2.9z"
+          />
+        </g>
+        <g
+          id="i-up"
+          stroke="currentColor"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 19V6M6 12l6-6 6 6" />
+        </g>
+        <g id="i-paw" fill="currentColor">
+          <ellipse cx="7.4" cy="8.6" rx="2.1" ry="2.7" />
+          <ellipse cx="12" cy="6.6" rx="2.1" ry="2.8" />
+          <ellipse cx="16.6" cy="8.6" rx="2.1" ry="2.7" />
+          <ellipse cx="19.3" cy="13.2" rx="1.9" ry="2.4" />
+          <path
+            d="M12 11.4c3.3 0 5.9 2.6 5.9 5.2 0 2.1-1.8 3.4-4 3.4-1 0-1.3-.3-1.9-.3s-.9.3-1.9.3c-2.2 0-4-1.3-4-3.4 0-2.6 2.6-5.2 5.9-5.2z"
+          />
+          <ellipse cx="4.7" cy="13.2" rx="1.9" ry="2.4" />
+        </g>
+        <g
+          id="i-plus"
+          stroke="currentColor"
+          stroke-width="1.8"
+          fill="none"
+          stroke-linecap="round"
+        >
+          <path d="M12 6v12M6 12h12" />
+        </g>
+        <g
+          id="i-check"
+          stroke="currentColor"
+          stroke-width="2.6"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 12.5l4.6 4.5L19 7" />
+        </g>
+        <g
+          id="i-vax"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17 3l4 4M19.5 4.5 15 9M6.5 20.5 3 21l.5-3.5L14 7l3 3z" />
+          <path d="m11 10 3 3" />
+        </g>
+        <g
+          id="i-file"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"
+          />
+          <path d="M14 3v5h5M9 13h6M9 17h4" />
+        </g>
+        <g
+          id="i-bowl"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3.5 11h17a8.5 8.5 0 0 1-8.5 8.5A8.5 8.5 0 0 1 3.5 11z" />
+          <path d="M8 8c0-2 1.8-3.5 4-3.5S16 6 16 8" />
+        </g>
+        <g
+          id="i-trend"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3.5 16.5 9 11l3.5 3.5L20.5 6.5" />
+          <path d="M15.5 6.5h5v5" />
+        </g>
+        <g
+          id="i-poster"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="4" y="3.5" width="16" height="17" rx="2.2" />
+          <path d="M8 8h8M8 12h8M8 16h5" />
+        </g>
+        <g
+          id="i-coin"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M9 8h6M9 11h6M14 8c0 3-2.2 3-5 3l5 5" />
+        </g>
+        <g
+          id="i-gear"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="3.2" />
+          <path
+            d="M19.3 14.6a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1v.2a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7h-.2a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1v-.2a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.8 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.2a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.4.9z"
+          />
+        </g>
+        <g
+          id="i-refresh"
+          stroke="currentColor"
+          stroke-width="1.8"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+          <path d="M20 4v4.5h-4.5" />
+        </g>
+        <g
+          id="i-share"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 15V4M8 7.5 12 3.5l4 4" />
+          <path d="M5 13v6a1.6 1.6 0 0 0 1.6 1.6h10.8A1.6 1.6 0 0 0 19 19v-6" />
+        </g>
+        <g
+          id="i-pin"
+          stroke="currentColor"
+          stroke-width="1.7"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M19 10c0 5.5-7 11-7 11S5 15.5 5 10a7 7 0 1 1 14 0z" />
+          <circle cx="12" cy="10" r="2.6" />
+        </g>
+        <g id="i-google">
+          <path
+            fill="#4285F4"
+            d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4z"
+          />
+          <path
+            fill="#34A853"
+            d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"
+          />
+          <path
+            fill="#FBBC05"
+            d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z"
+          />
+          <path
+            fill="#EA4335"
+            d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z"
+          />
+        </g>
+        <g id="i-apple" fill="currentColor">
+          <path
+            d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.8-3.6.8s-1.9-.8-3.1-.8c-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.5 3 2.4 1.2 0 1.6-.8 3.1-.8s1.9.8 3.1.7c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-1-2.6-4zM14.1 5.6c.7-.8 1.1-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"
+          />
+        </g>
+        <g id="i-meta" fill="currentColor">
+          <path
+            d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"
+          />
+        </g>
+      </defs>
+    </svg>
+
+    <!-- ============ presenter drawer ============ -->
+    <aside class="presenter" id="presenter" aria-label="Screen list">
+      <h2>PawPal</h2>
+      <p class="hint">Fourteen screens on the Care Thread</p>
+      <ol id="jumplist"></ol>
+      <p class="keys">
+        <kbd>&larr;</kbd> <kbd>&rarr;</kbd> step through screens<br />
+        <kbd>P</kbd> this list &nbsp; <kbd>G</kbd> layout grid<br />
+        <kbd>R</kbd> replay the animations
+      </p>
+    </aside>
+    <p class="nudge" id="nudge">Press <kbd>P</kbd> for the screen list</p>
+
+    <!-- ============ stage ============ -->
+    <div class="stage">
+      <div class="phone-wrap" id="phoneWrap">
+        <div class="phone">
+          <span class="btn-side action"></span
+          ><span class="btn-side vol-up"></span>
+          <span class="btn-side vol-dn"></span
+          ><span class="btn-side power"></span>
+
+          <div class="viewport" id="viewport">
+            <div class="island"></div>
+            <div class="statusbar" id="statusbar">
+              <span class="num">9:41</span>
+              <span class="glyphs">
+                <svg
+                  width="18"
+                  height="12"
+                  viewBox="0 0 18 12"
+                  fill="currentColor"
+                >
+                  <rect x="0" y="8" width="3" height="4" rx="1" />
+                  <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="0" width="3" height="12" rx="1" />
+                </svg>
+                <svg
+                  width="16"
+                  height="12"
+                  viewBox="0 0 16 12"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M8 11.2 6 8.9a3 3 0 0 1 4 0zM3.6 6.3 2 4.5a9 9 0 0 1 12 0l-1.6 1.8a6.6 6.6 0 0 0-8.8 0zM8 0a12 12 0 0 0-8 3l1.6 1.8a9.6 9.6 0 0 1 12.8 0L16 3a12 12 0 0 0-8-3z"
+                    opacity=".95"
+                  />
+                </svg>
+                <svg width="25" height="12" viewBox="0 0 25 12">
+                  <rect
+                    x="0.5"
+                    y="0.5"
+                    width="21"
+                    height="11"
+                    rx="3.2"
+                    fill="none"
+                    stroke="currentColor"
+                    opacity=".4"
+                  />
+                  <rect
+                    x="2"
+                    y="2"
+                    width="18"
+                    height="8"
+                    rx="2"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M23 4.2v3.6a2 2 0 0 0 0-3.6z"
+                    fill="currentColor"
+                    opacity=".4"
+                  />
+                </svg>
+              </span>
+            </div>
+
+            <div class="compact-bar" id="compactBar"></div>
+            <div class="grid-overlay" id="gridOverlay"></div>
+            <div class="toast" id="toast"></div>
+
+            <div class="screens" id="screens">
+              <!-- ========== SIGN IN ========== -->
+              <section
+                class="screen"
+                id="s-signin"
+                data-name="Sign in"
+                data-tab=""
+              >
+                <div class="brandmark rise" style="--d: 0">
+                  <svg class="paws" aria-hidden="true">
+                    <rect width="100%" height="100%" fill="url(#pawpat)" />
+                  </svg>
+                  <span class="mark"
+                    ><svg width="34" height="34"><use href="#i-paw" /></svg
+                  ></span>
+                  <span class="chip"
+                    ><svg width="14" height="14"><use href="#i-paw" /></svg>2
+                    pets, 1 thread</span
+                  >
+                  <span class="wordmark"
+                    >PawPal<small
+                      >Everything about them, in one thread</small
+                    ></span
+                  >
+                </div>
+
+                <form id="signinForm" novalidate>
+                  <label
+                    class="form-label eyebrow rise"
+                    style="--d: 1"
+                    for="email"
+                    >Email</label
+                  >
+                  <input
+                    class="field rise"
+                    style="--d: 1"
+                    id="email"
+                    type="email"
+                    value="aarav@pawpal.in"
+                    autocomplete="username"
+                  />
+
+                  <label class="form-label eyebrow rise" style="--d: 2" for="pw"
+                    >Password</label
+                  >
+                  <div class="field-wrap rise" style="--d: 2">
+                    <input
+                      class="field"
+                      id="pw"
+                      type="password"
+                      value="pawpal123"
+                      autocomplete="current-password"
+                    />
+                    <button
+                      class="reveal"
+                      type="button"
+                      id="revealPw"
+                      aria-label="Show password"
+                    >
+                      Show
+                    </button>
+                  </div>
+
+                  <div class="signin-foot rise" style="--d: 3">
+                    <label class="check"
+                      ><input type="checkbox" checked /><span class="box"
+                        ><svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12.5l4.6 4.5L19 7" /></svg></span
+                      >Keep me signed in</label
+                    >
+                    <button class="link" type="button" data-sheet="forgot">
+                      Forgot password?
+                    </button>
+                  </div>
+
+                  <div class="rise" style="--d: 4">
+                    <div style="height: 22px"></div>
+                    <button class="btn pine" type="button" id="signinBtn">
+                      Sign in
+                    </button>
+                  </div>
+                  <div
+                    class="rise"
+                    style="--d: 5; text-align: center; margin-top: 14px"
+                  >
+                    <button class="link" type="button" data-sheet="signup">
+                      New here? Create an account
+                    </button>
+                  </div>
+                </form>
+
+                <div class="or rise" style="--d: 5">
+                  <span>or continue with</span>
+                </div>
+                <button class="sso rise" style="--d: 5" data-go="s-onboard">
+                  <svg width="20" height="20" viewBox="0 0 24 24">
+                    <use href="#i-google" /></svg
+                  >Continue with Google
+                </button>
+                <button
+                  class="sso apple rise"
+                  style="--d: 6"
+                  data-go="s-onboard"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24">
+                    <use href="#i-apple" /></svg
+                  >Continue with Apple
+                </button>
+                <button
+                  class="sso meta rise"
+                  style="--d: 6"
+                  data-go="s-onboard"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24">
+                    <use href="#i-meta" /></svg
+                  >Continue with Facebook
+                </button>
+              </section>
+
+              <!-- ========== ONBOARDING ========== -->
+              <section
+                class="screen"
+                id="s-onboard"
+                data-name="Onboarding"
+                data-tab=""
+              >
+                <div class="steps rise" style="--d: 0">
+                  <i class="on"></i><i></i><i></i>
+                </div>
+
+                <div class="step on" data-step="1">
+                  <h1 class="display rise" style="--d: 1; margin-top: 26px">
+                    Who are we<br />caring for?
+                  </h1>
+                  <p class="subhead rise" style="--d: 2">
+                    You can add the rest of the family later.
+                  </p>
+                  <div class="rise" style="--d: 3; margin-top: 24px">
+                    <button
+                      class="choice on"
+                      data-pick="species"
+                      data-species="dog"
+                    >
+                      <span class="em">&#128021;</span>Dog<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button
+                      class="choice"
+                      data-pick="species"
+                      data-species="cat"
+                    >
+                      <span class="em">&#128008;</span>Cat<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button
+                      class="choice"
+                      data-pick="species"
+                      data-species="rabbit"
+                    >
+                      <span class="em">&#128048;</span>Rabbit<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button
+                      class="choice"
+                      data-pick="species"
+                      data-species="bird"
+                    >
+                      <span class="em">&#129417;</span>Bird<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="step" data-step="2">
+                  <h1 class="display" style="margin-top: 26px">
+                    Tell us about<br />your <span data-bind="species">dog</span>
+                  </h1>
+                  <p class="subhead">
+                    Everything on this screen shows up across the app.
+                  </p>
+
+                  <div class="field-pair">
+                    <div>
+                      <label class="form-label eyebrow" for="petname"
+                        >Pet&rsquo;s name</label
+                      >
+                      <input
+                        class="field"
+                        id="petname"
+                        value="Bruno"
+                        autocomplete="off"
+                        maxlength="18"
+                      />
+                    </div>
+                    <div>
+                      <label class="form-label eyebrow" for="ownername"
+                        >Your name</label
+                      >
+                      <input
+                        class="field"
+                        id="ownername"
+                        value="Aarav"
+                        autocomplete="off"
+                        maxlength="18"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="field-pair">
+                    <div>
+                      <label class="form-label eyebrow" for="breed"
+                        >Breed</label
+                      >
+                      <input
+                        class="field"
+                        id="breed"
+                        value="Indie"
+                        autocomplete="off"
+                        maxlength="20"
+                      />
+                    </div>
+                    <div>
+                      <label class="form-label eyebrow" for="weight"
+                        >Weight (kg)</label
+                      >
+                      <input
+                        class="field"
+                        id="weight"
+                        type="number"
+                        step="0.1"
+                        min="0.2"
+                        max="90"
+                        value="18.4"
+                      />
+                    </div>
+                  </div>
+
+                  <label class="form-label eyebrow">Age</label>
+                  <div class="chip-row">
+                    <button
+                      class="chip"
+                      data-pick="age"
+                      data-age="Under 1"
+                      data-years="0.6"
+                    >
+                      Under 1 year
+                    </button>
+                    <button
+                      class="chip on"
+                      data-pick="age"
+                      data-age="4 yr"
+                      data-years="4"
+                    >
+                      1 to 7 years
+                    </button>
+                    <button
+                      class="chip"
+                      data-pick="age"
+                      data-age="9 yr"
+                      data-years="9"
+                    >
+                      Over 7 years
+                    </button>
+                  </div>
+
+                  <label class="form-label eyebrow">Sex</label>
+                  <div class="chip-row">
+                    <button class="chip on" data-pick="sex" data-sex="male">
+                      Male
+                    </button>
+                    <button class="chip" data-pick="sex" data-sex="female">
+                      Female
+                    </button>
+                  </div>
+                </div>
+
+                <div class="step" data-step="3">
+                  <h1 class="display" style="margin-top: 26px">
+                    What should<br />we remind you<br />about?
+                  </h1>
+                  <p class="subhead">
+                    Each one becomes an entry on
+                    <span data-bind="name-poss">Bruno&rsquo;s</span> care
+                    thread.
+                  </p>
+                  <div style="margin-top: 20px">
+                    <button class="choice on" data-toggle="1">
+                      <span class="em">&#127859;</span>Meals<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button class="choice on" data-toggle="1">
+                      <span class="em">&#128138;</span>Medicines<span
+                        class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button class="choice on" data-toggle="1">
+                      <span class="em">&#128137;</span>Vaccinations<span
+                        class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                    <button class="choice" data-toggle="1">
+                      <span class="em">&#129462;</span>Walks<span class="tick"
+                        ><svg width="20" height="20">
+                          <use href="#i-check" /></svg
+                      ></span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="onboard-foot">
+                  <button class="btn pine" id="onboardNext">Continue</button>
+                  <div style="height: 10px"></div>
+                  <button
+                    class="btn ghost"
+                    id="onboardBack"
+                    style="display: none"
+                  >
+                    Back
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== HOME ========== -->
+              <section
+                class="screen has-tabs"
+                id="s-home"
+                data-name="Home &middot; the Care Thread"
+                data-tab="home"
+              >
+                <div class="refresh" id="refresh">
+                  <svg width="22" height="22"><use href="#i-paw" /></svg>
+                </div>
+
+                <div class="head-row">
+                  <h1 class="display rise" style="--d: 0">
+                    <span data-bind="greeting">Good morning</span>,<br /><span
+                      data-bind="owner"
+                      >Aarav</span
+                    >
+                  </h1>
+                  <button class="pill alarm rise" style="--d: 1" data-emergency>
+                    <span class="beacon"></span>Emergency
+                  </button>
+                </div>
+                <p class="subhead rise" style="--d: 1" data-bind="today">
+                  Thursday, 21 August
+                </p>
+
+                <div class="pets rise" style="--d: 2" id="petRow"></div>
+
+                <button class="ask rise" style="--d: 3" data-go="s-assistant">
+                  <span class="spark"
+                    ><svg width="18" height="18"><use href="#i-paw" /></svg
+                  ></span>
+                  How is <span data-bind="name">Bruno</span> today?
+                </button>
+
+                <div class="thread-head rise" style="--d: 4">
+                  <h2 class="title">Care thread</h2>
+                  <span class="eyebrow">Today</span>
+                </div>
+
+                <div class="thread">
+                  <span class="rail"></span>
+                  <button class="entry done" style="--d: 0" data-go="s-feeding">
+                    <span class="node done"></span>
+                    <h4>Breakfast &middot; 180 g kibble</h4>
+                    <p>7:30 am &middot; logged</p>
+                  </button>
+                  <button
+                    class="entry done"
+                    style="--d: 1"
+                    data-toast="2.1 km, 34 minutes, Cubbon Park loop"
+                  >
+                    <span class="node done"></span>
+                    <h4>Morning walk &middot; 2.1 km</h4>
+                    <p>8:05 am &middot; 34 min</p>
+                  </button>
+
+                  <div class="now-marker">
+                    <span class="node"></span><span>NOW &middot; 11:20 AM</span
+                    ><span class="line"></span>
+                  </div>
+
+                  <button class="entry due" style="--d: 2" data-go="s-records">
+                    <span class="node due"></span>
+                    <h4>Carprofen &middot; half tablet</h4>
+                    <p>Due 2:00 pm &middot; with food</p>
+                  </button>
+                  <button class="entry" style="--d: 3" data-go="s-vaccines">
+                    <span class="node"></span>
+                    <h4>Rabies booster</h4>
+                    <p>Thursday 28 Aug &middot; Paws Clinic, 1.2 km</p>
+                  </button>
+                  <button class="entry" style="--d: 4" data-go="s-feeding">
+                    <span class="node"></span>
+                    <h4>Dinner &middot; 180 g kibble</h4>
+                    <p>7:00 pm</p>
+                  </button>
+                  <button
+                    class="entry done"
+                    style="--d: 5"
+                    data-go="s-spending"
+                  >
+                    <span class="node done"></span>
+                    <h4>&#8377;2,840 spent this month</h4>
+                    <p>Food, vet and medicines</p>
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== ASSISTANT ========== -->
+              <section
+                class="screen"
+                id="s-assistant"
+                data-name="AI Assistant &middot; structured answers"
+                data-tab="chat"
+                style="padding-bottom: 178px"
+              >
+                <div class="head-row rise" style="--d: 0">
+                  <h1 class="display">Assistant</h1>
+                  <button
+                    class="link"
+                    style="
+                      color: var(--slate);
+                      font-weight: 400;
+                      font-size: 15px;
+                    "
+                    data-go="s-profile"
+                  >
+                    About <span data-bind="name">Bruno</span>
+                  </button>
+                </div>
+
+                <div id="thread-chat">
+                  <div class="bubble-me rise" style="--d: 1">
+                    <span data-bind="They">He</span> has been off
+                    <span data-bind="their">his</span> food since last night and
+                    slept most of today.
+                  </div>
+                  <p
+                    class="eyebrow rise"
+                    style="--d: 2"
+                    id="assistantLabel"
+                    hidden
+                  >
+                    Assistant
+                  </p>
+                  <div class="typing rise" id="typing" style="--d: 2">
+                    <i></i><i></i><i></i>
+                  </div>
+
+                  <div class="card answer" id="answer" hidden>
+                    <div class="part" style="--d: 0">
+                      <p class="eyebrow">What it might be</p>
+                      <p>
+                        Reduced appetite with low energy for under 24 hours is
+                        often a mild stomach upset.
+                        <span data-bind="name">Bruno</span> is also on day 4 of
+                        carprofen, which can put
+                        <span data-bind="speciesPlural">dogs</span> off food.
+                      </p>
+                    </div>
+                    <div class="part" style="--d: 1">
+                      <p class="eyebrow">What to do now</p>
+                      <p>
+                        Offer plain boiled rice and chicken in small portions.
+                        Keep water available and give the 2 pm tablet with food,
+                        not on an empty stomach. Note how much
+                        <span data-bind="they">he</span> eats tonight.
+                      </p>
+                    </div>
+                    <div class="part" style="--d: 2">
+                      <p class="eyebrow">When to see a vet</p>
+                      <p>
+                        If <span data-bind="they">he</span> refuses food for
+                        another 24 hours, vomits more than twice, or the gums
+                        look pale, call Dr. Menon the same day.
+                      </p>
+                    </div>
+                    <div class="part" style="--d: 3">
+                      <button class="btn ghost" data-log-thread="1">
+                        Log this in the thread
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="composer">
+                  <p class="disclaimer">
+                    Guidance only. It does not replace a veterinarian.
+                  </p>
+                  <form id="askForm">
+                    <input
+                      class="field"
+                      id="askInput"
+                      placeholder="Ask about Bruno"
+                      data-ph="askPlaceholder"
+                      autocomplete="off"
+                    />
+                    <button
+                      class="send"
+                      type="button"
+                      id="askSend"
+                      aria-label="Send"
+                    >
+                      <svg width="19" height="19"><use href="#i-up" /></svg>
+                    </button>
+                  </form>
+                </div>
+              </section>
+
+              <!-- ========== EMERGENCY ========== -->
+              <section
+                class="screen"
+                id="s-emergency"
+                data-name="Emergency mode"
+                data-tab=""
+                data-dark="1"
+                style="padding-bottom: 120px"
+              >
+                <div class="em-top rise" style="--d: 0">
+                  <p class="eyebrow">Emergency</p>
+                  <button class="em-close" data-back>Close</button>
+                </div>
+                <h1 class="display rise" style="--d: 1; margin-top: 22px">
+                  <span data-bind="name">Bruno</span> needs<br />a vet now
+                </h1>
+                <p class="subhead rise" style="--d: 2">
+                  Sharing <span data-bind="their">his</span> records and your
+                  location with whoever answers.
+                </p>
+
+                <button
+                  class="call rise"
+                  style="--d: 3"
+                  data-call="City Pet Hospital"
+                >
+                  <svg width="21" height="21"><use href="#i-phone" /></svg>Call
+                  City Pet Hospital
+                </button>
+
+                <div class="rows rise" style="--d: 4">
+                  <button class="row" data-call="City Pet Hospital">
+                    <span
+                      ><span class="k">City Pet Hospital</span><br /><span
+                        class="v"
+                        >2.4 km &middot; open 24 hours &middot;
+                        Koramangala</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <button class="row" data-call="Pet ambulance">
+                    <span
+                      ><span class="k">Pet ambulance</span><br /><span class="v"
+                        >Pickup in about 14 min</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <button class="row" data-call="Dr. Menon">
+                    <span
+                      ><span class="k">Dr. Menon &middot; your vet</span
+                      ><br /><span class="v"
+                        >Closed now &middot; opens 9:00 am</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="vitals rise" style="--d: 5">
+                  <p class="eyebrow">Read this to the vet</p>
+                  <dl>
+                    <dt>Weight</dt>
+                    <dd><span data-bind="weight">18.4</span> kg</dd>
+                    <dt>Allergies</dt>
+                    <dd data-bind="allergies">Chicken, dust mites</dd>
+                    <dt>Blood group</dt>
+                    <dd>DEA 1.1 negative</dd>
+                    <dt>On medication</dt>
+                    <dd>Carprofen, day 4</dd>
+                    <dt>Microchip</dt>
+                    <dd class="num">985 141 000 273 118</dd>
+                  </dl>
+                </div>
+
+                <div class="em-foot">
+                  <button
+                    class="btn"
+                    data-toast="Location shared with City Pet Hospital"
+                  >
+                    <svg width="19" height="19"><use href="#i-pin" /></svg>Share
+                    location
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== PET PROFILE ========== -->
+              <section
+                class="screen flush edge has-tabs"
+                id="s-profile"
+                data-name="Pet profile &middot; dossier"
+                data-tab="person"
+              >
+                <header class="pet-hero bleed">
+                  <svg class="paws" aria-hidden="true">
+                    <rect width="100%" height="100%" fill="url(#pawpat)" />
+                  </svg>
+                  <button
+                    class="icon-btn"
+                    data-go="s-settings"
+                    aria-label="Settings"
+                  >
+                    <svg width="19" height="19"><use href="#i-gear" /></svg>
+                  </button>
+
+                  <div class="pet-avatar rise" style="--d: 0">
+                    <svg viewBox="20 10 210 180">
+                      <use class="pet-use" href="#pup-dog" />
+                    </svg>
+                  </div>
+                  <h1 class="display rise" style="--d: 1" data-bind="name">
+                    Bruno
+                  </h1>
+                  <p class="chip-line rise" style="--d: 2">
+                    <span data-bind="breed">Indie</span>
+                    <span data-bind="sex">Male</span>
+                    <span data-bind="age">4 yr</span>
+                  </p>
+                </header>
+
+                <div class="stat-card bleed rise" style="--d: 3">
+                  <div class="stat">
+                    <span
+                      class="figure"
+                      data-count="4"
+                      data-suffix=" yr"
+                      data-bind-count="years"
+                      >4 yr</span
+                    >
+                    <p class="eyebrow">Age</p>
+                  </div>
+                  <div class="stat">
+                    <span
+                      class="figure"
+                      data-count="18.4"
+                      data-dec="1"
+                      data-bind-count="weight"
+                      >18.4</span
+                    >
+                    <p class="eyebrow">kg</p>
+                  </div>
+                  <div class="stat">
+                    <span class="figure fit" data-bind="breed">Indie</span>
+                    <p class="eyebrow">Breed</p>
+                  </div>
+                </div>
+
+                <p class="eyebrow section-gap rise" style="--d: 4">Care</p>
+                <div class="link-grid rise" style="--d: 4">
+                  <button class="link-card" data-go="s-vaccines">
+                    <svg class="ic"><use href="#i-vax" /></svg
+                    ><b>Vaccinations</b><span>One due in 7 days</span>
+                  </button>
+                  <button class="link-card" data-go="s-records">
+                    <svg class="ic"><use href="#i-file" /></svg><b>Records</b
+                    ><span>9 on file</span>
+                  </button>
+                  <button class="link-card" data-go="s-feeding">
+                    <svg class="ic"><use href="#i-bowl" /></svg><b>Feeding</b
+                    ><span><span data-bind="grams">360</span> g per day</span>
+                  </button>
+                  <button class="link-card" data-go="s-growth">
+                    <svg class="ic"><use href="#i-trend" /></svg><b>Growth</b
+                    ><span
+                      ><span data-bind="weight">18.4</span> kg, steady</span
+                    >
+                  </button>
+                  <button class="link-card" data-go="s-spending">
+                    <svg class="ic"><use href="#i-coin" /></svg><b>Spending</b
+                    ><span
+                      >&#8377;<span data-bind="spend">2,840</span> in
+                      August</span
+                    >
+                  </button>
+                  <button class="link-card alarm" data-go="s-poster">
+                    <svg class="ic"><use href="#i-poster" /></svg
+                    ><b>Lost poster</b><span>Ready to share</span>
+                  </button>
+                </div>
+
+                <p class="eyebrow section-gap rise" style="--d: 5">
+                  Vitals on file
+                </p>
+                <div class="rows rise" style="--d: 5">
+                  <button class="row" data-sheet="allergies">
+                    <span class="k">Allergies</span
+                    ><span class="v" data-bind="allergies"
+                      >Chicken, dust mites</span
+                    >
+                  </button>
+                  <div class="row">
+                    <span class="k">Blood group</span
+                    ><span class="v">DEA 1.1 negative</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Microchip</span
+                    ><span class="v num">985 141 000 273 118</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Insurance</span
+                    ><span class="v">Bajaj &middot; valid to Mar 2027</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">With you since</span
+                    ><span class="v" data-bind="since">March 2022</span>
+                  </div>
+                </div>
+
+                <p class="eyebrow section-gap rise" style="--d: 6">
+                  Medical history
+                </p>
+                <div class="rows rise" style="--d: 6">
+                  <div class="row">
+                    <span class="k">14 Aug 2026</span
+                    ><span class="v">Annual check &middot; all clear</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">02 Jun 2026</span
+                    ><span class="v">Tick fever &middot; full recovery</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">09 Aug 2025</span
+                    ><span class="v">Rabies + DHPPi booster</span>
+                  </div>
+                </div>
+
+                <div class="rise" style="--d: 7; margin-top: 24px">
+                  <button class="btn ghost" data-sheet="edit-pet">
+                    <svg width="18" height="18"><use href="#i-gear" /></svg>Edit
+                    <span data-bind="name">Bruno</span>&rsquo;s details
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== VACCINATIONS ========== -->
+              <section
+                class="screen"
+                id="s-vaccines"
+                data-name="Vaccination tracker &middot; timeline"
+                data-tab=""
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb"
+                    ><span data-bind="name">Bruno</span> &middot; care</span
+                  >
+                </div>
+                <h1 class="display rise" style="--d: 1">Vaccinations</h1>
+                <p class="subhead rise" style="--d: 2">
+                  One due in 7 days. Everything else is current.
+                </p>
+
+                <div class="vax">
+                  <span class="rail"></span>
+                  <div class="vax-item due" style="--d: 0">
+                    <span class="node"></span>
+                    <p class="when">Due 28 August</p>
+                    <div class="card">
+                      <h4>Rabies booster</h4>
+                      <p class="meta">Annual &middot; last given 30 Aug 2025</p>
+                      <div style="height: 16px"></div>
+                      <button class="btn" data-sheet="book-vax">
+                        Book at Paws Clinic
+                      </button>
+                    </div>
+                  </div>
+                  <div class="vax-item" style="--d: 1">
+                    <span class="node"></span>
+                    <p class="when">Due 12 November</p>
+                    <h4>Deworming &middot; quarterly</h4>
+                    <p class="meta">Last given 12 Aug &middot; Drontal Plus</p>
+                  </div>
+                </div>
+
+                <p class="eyebrow rise" style="--d: 3">Already given</p>
+                <div class="rows rise" style="--d: 3">
+                  <div class="row">
+                    <span class="k">30 Aug 2025</span
+                    ><span class="v">Rabies &middot; annual</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">09 Aug 2025</span
+                    ><span class="v">DHPPi booster</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">02 Jun 2025</span
+                    ><span class="v">Leptospirosis</span>
+                  </div>
+                  <div class="row faded">
+                    <span class="k">18 Mar 2022</span
+                    ><span class="v">Puppy course, complete</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ========== RECORDS ========== -->
+              <section
+                class="screen"
+                id="s-records"
+                data-name="Health records"
+                data-tab=""
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb"
+                    ><span data-bind="name">Bruno</span> &middot; care</span
+                  >
+                </div>
+                <h1 class="display rise" style="--d: 1">Records</h1>
+
+                <div class="card rise" style="--d: 2; margin-top: 22px">
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: baseline;
+                    "
+                  >
+                    <p class="eyebrow">Weight</p>
+                    <span class="label num">+0.3 in 6 weeks</span>
+                  </div>
+                  <p class="figure" style="font-size: 34px; margin: 4px 0 0">
+                    <span data-bind="weight">18.4</span> kg
+                  </p>
+                  <svg
+                    class="chart"
+                    viewBox="0 0 300 92"
+                    preserveAspectRatio="none"
+                    style="height: 92px; margin-top: 14px"
+                  >
+                    <path
+                      class="area"
+                      style="--o: 1"
+                      d="M0,74 L50,68 L100,70 L150,54 L200,42 L250,32 L300,22 L300,92 L0,92 Z"
+                    />
+                    <path
+                      class="line"
+                      d="M0,74 L50,68 L100,70 L150,54 L200,42 L250,32 L300,22"
+                    />
+                  </svg>
+                  <div class="axis">
+                    <span>Jul 10</span><span>Jul 31</span><span>Aug 21</span>
+                  </div>
+                </div>
+
+                <p class="eyebrow rise" style="--d: 3; margin-top: 30px">
+                  Recent visits
+                </p>
+                <div class="rows rise" style="--d: 3">
+                  <button
+                    class="row"
+                    data-toast="Annual check &middot; Dr. Menon &middot; all clear"
+                  >
+                    <span
+                      ><span class="k">14 Aug 2026</span><br /><span class="v"
+                        >Annual check &middot; Dr. Menon</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <button
+                    class="row"
+                    data-toast="Tick fever &middot; treated with doxycycline, 21 days"
+                  >
+                    <span
+                      ><span class="k">02 Jun 2026</span><br /><span class="v"
+                        >Tick fever &middot; full recovery</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <button
+                    class="row"
+                    data-toast="Carprofen 25 mg &middot; half tablet twice daily, 7 days"
+                  >
+                    <span
+                      ><span class="k">14 Aug 2026</span><br /><span class="v"
+                        >Carprofen prescribed &middot; 7 days</span
+                      ></span
+                    >
+                    <svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                </div>
+
+                <p class="eyebrow rise" style="--d: 4; margin-top: 30px">
+                  Documents
+                </p>
+                <div class="rows rise" style="--d: 4">
+                  <div class="row">
+                    <span class="k">Vaccination card</span
+                    ><span class="v dim">PDF &middot; 2 pages</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Blood panel</span
+                    ><span class="v dim">Jun 2026</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Insurance policy</span
+                    ><span class="v dim">Bajaj &middot; Mar 2027</span>
+                  </div>
+                </div>
+
+                <div class="rise" style="--d: 5; margin-top: 24px">
+                  <button class="btn ghost" data-sheet="add-record">
+                    <svg width="19" height="19"><use href="#i-plus" /></svg>Add
+                    record
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== FEEDING ========== -->
+              <section
+                class="screen"
+                id="s-feeding"
+                data-name="Feeding planner"
+                data-tab=""
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb"
+                    ><span data-bind="name">Bruno</span> &middot; care</span
+                  >
+                </div>
+                <h1 class="display rise" style="--d: 1">Feeding</h1>
+                <p class="subhead rise" style="--d: 2">
+                  For <span data-bind="weight">18.4</span> kg, moderately
+                  active, chicken-free.
+                </p>
+
+                <div class="hero-figure rise" style="--d: 3">
+                  <span class="figure" data-count="360" data-bind-count="grams"
+                    >360</span
+                  ><span class="unit">g per day</span>
+                </div>
+                <p class="label rise" style="--d: 3">
+                  Two meals of <span data-bind="halfGrams">180</span> g &middot;
+                  <span data-bind="kcal">1,240</span> kcal
+                </p>
+
+                <div class="rise" style="--d: 4; margin-top: 28px">
+                  <button
+                    class="meal given"
+                    data-meal
+                    data-label="Breakfast"
+                    data-time="7:30 am"
+                  >
+                    <div class="t">
+                      <b>Breakfast</b
+                      ><span
+                        >7:30 am &middot;
+                        <span data-bind="halfGrams">180</span> g kibble</span
+                      >
+                    </div>
+                    <span class="state"
+                      ><span class="tick"
+                        ><svg
+                          viewBox="0 0 24 24"
+                          width="13"
+                          height="13"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12.5l4.6 4.5L19 7" /></svg></span
+                      ><span class="word">Given</span></span
+                    >
+                  </button>
+                  <button
+                    class="meal"
+                    data-meal
+                    data-label="Dinner"
+                    data-time="7:00 pm"
+                  >
+                    <div class="t">
+                      <b>Dinner</b
+                      ><span
+                        >7:00 pm &middot;
+                        <span data-bind="halfGrams">180</span> g kibble +
+                        curd</span
+                      >
+                    </div>
+                    <span class="state"
+                      ><span class="tick"
+                        ><svg
+                          viewBox="0 0 24 24"
+                          width="13"
+                          height="13"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12.5l4.6 4.5L19 7" /></svg></span
+                      ><span class="word">7:00 pm</span></span
+                    >
+                  </button>
+                </div>
+
+                <p class="eyebrow rise" style="--d: 5; margin-top: 30px">
+                  Avoid
+                </p>
+                <p class="body rise" style="--d: 5">
+                  Chicken in any form, including treats and broth. Grapes,
+                  onion, chocolate, xylitol.
+                </p>
+
+                <div class="rise" style="--d: 6; margin-top: 26px">
+                  <button class="btn ghost" data-sheet="log-portion">
+                    Change the daily portion
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== GROWTH ========== -->
+              <section
+                class="screen"
+                id="s-growth"
+                data-name="Growth tracker"
+                data-tab=""
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb"
+                    ><span data-bind="name">Bruno</span> &middot; care</span
+                  >
+                </div>
+                <h1 class="display rise" style="--d: 1">Growth</h1>
+                <div class="hero-figure rise" style="--d: 2">
+                  <span
+                    class="figure"
+                    style="font-size: 62px"
+                    data-count="18.4"
+                    data-dec="1"
+                    data-bind-count="weight"
+                    >18.4</span
+                  ><span class="unit">kg</span>
+                </div>
+                <p class="subhead rise" style="--d: 2">
+                  Inside the breed-normal band for
+                  <span data-bind="breed">Indie</span>,
+                  <span data-bind="age">4 yr</span>.
+                </p>
+
+                <div class="card rise" style="--d: 3; margin-top: 22px">
+                  <svg
+                    class="chart"
+                    viewBox="0 0 300 196"
+                    preserveAspectRatio="none"
+                    style="height: 196px"
+                  >
+                    <path
+                      class="band"
+                      style="--o: 0.55"
+                      d="M0,150 C40,130 70,90 110,56 C150,28 200,12 300,4 L300,42 C200,50 150,70 110,98 C70,132 40,168 0,186 Z"
+                    />
+                    <path
+                      class="line"
+                      d="M0,168 C40,148 70,108 110,74 C150,46 200,28 300,20"
+                    />
+                    <circle class="tipdot" cx="300" cy="20" r="4.5" />
+                  </svg>
+                  <div class="axis">
+                    <span>2022</span><span>2023</span><span>2024</span
+                    ><span>2025</span><span>Now</span>
+                  </div>
+                  <div class="legend">
+                    <span><i></i>Bruno</span
+                    ><span><i class="band"></i>Breed normal</span>
+                  </div>
+                </div>
+
+                <div class="rows rise" style="--d: 4">
+                  <div class="row">
+                    <span class="k">21 Aug 2026</span
+                    ><span class="v num">18.4 kg</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">10 Jul 2026</span
+                    ><span class="v num">18.1 kg</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">02 Jun 2026</span
+                    ><span class="v num">17.6 kg</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">14 Apr 2026</span
+                    ><span class="v num">17.9 kg</span>
+                  </div>
+                </div>
+
+                <div class="rise" style="--d: 5; margin-top: 24px">
+                  <button class="btn ghost" data-sheet="log-weight">
+                    Log today&rsquo;s weight
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== SPENDING ========== -->
+              <section
+                class="screen has-tabs"
+                id="s-spending"
+                data-name="Expense tracker"
+                data-tab="heart"
+              >
+                <h1 class="display rise" style="--d: 0">Spending</h1>
+                <p
+                  class="figure rise"
+                  style="--d: 1; font-size: 58px; margin: 10px 0 0"
+                >
+                  &#8377;<span data-count="2840" data-comma="1" id="spendTotal"
+                    >2,840</span
+                  >
+                </p>
+                <p class="subhead rise" style="--d: 1">
+                  August &middot; &#8377;460 less than July
+                </p>
+
+                <div class="donut-wrap rise" style="--d: 2">
+                  <svg class="donut" viewBox="0 0 158 158">
+                    <circle class="track" cx="79" cy="79" r="68" />
+                    <circle
+                      class="seg"
+                      cx="79"
+                      cy="79"
+                      r="68"
+                      stroke="#23372B"
+                      style="--dash: 248.24 427.26; --len: 248.24; --d: 0"
+                      transform="rotate(0 79 79)"
+                    />
+                    <circle
+                      class="seg"
+                      cx="79"
+                      cy="79"
+                      r="68"
+                      stroke="#E8A33D"
+                      style="--dash: 133.9 427.26; --len: 133.9; --d: 1"
+                      transform="rotate(209.2 79 79)"
+                    />
+                    <circle
+                      class="seg"
+                      cx="79"
+                      cy="79"
+                      r="68"
+                      stroke="#E7C8BE"
+                      style="--dash: 45.12 427.26; --len: 45.12; --d: 2"
+                      transform="rotate(322 79 79)"
+                    />
+                  </svg>
+                  <div class="donut-key">
+                    <div>
+                      <i style="background: #23372b"></i>Food<span class="num"
+                        >58%</span
+                      >
+                    </div>
+                    <div>
+                      <i style="background: #e8a33d"></i>Vet<span class="num"
+                        >31%</span
+                      >
+                    </div>
+                    <div>
+                      <i style="background: #e7c8be"></i>Medicines<span
+                        class="num"
+                        >11%</span
+                      >
+                    </div>
+                    <div>
+                      <i style="background: #e4dfd4"></i>Grooming<span
+                        class="num"
+                        >0%</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rows rise" style="--d: 3" id="spendRows"></div>
+
+                <div class="rise" style="--d: 4; margin-top: 24px">
+                  <button class="btn" data-sheet="add-expense">
+                    <svg width="19" height="19"><use href="#i-plus" /></svg>Add
+                    expense
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== LOST POSTER ========== -->
+              <section
+                class="screen"
+                id="s-poster"
+                data-name="Lost pet poster &middot; live preview"
+                data-tab=""
+                style="padding-bottom: 120px"
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb"><span data-bind="name">Bruno</span></span>
+                </div>
+                <h1 class="display rise" style="--d: 1">Lost poster</h1>
+
+                <div class="card rise" style="--d: 2; margin-top: 20px">
+                  <p class="eyebrow" style="margin-bottom: 14px">Preview</p>
+                  <div class="poster">
+                    <h3>Missing: <span data-bind="name">Bruno</span></h3>
+                    <div class="photo">
+                      <svg class="pup" viewBox="0 0 240 200">
+                        <use class="pet-use" href="#pup-dog" />
+                      </svg>
+                    </div>
+                    <p>
+                      <span data-bind="breed">Indie</span>,
+                      <span data-bind="sexLower">male</span>,
+                      <span data-bind="age">4 yr</span>,
+                      <span data-bind="weight">18.4</span> kg. Brown with a
+                      white chest patch. Last seen near
+                      <span data-bind="lastSeen">Koramangala 5th Block</span> on
+                      20 August, evening. Answers to
+                      <span data-bind="their">his</span> name, nervous with
+                      strangers.
+                    </p>
+                    <div class="foot">
+                      <b
+                        >Call <span data-bind="owner">Aarav</span> &middot;
+                        98450 12233</b
+                      ><span>Reward offered</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rows rise" style="--d: 3">
+                  <button class="row" data-sheet="last-seen">
+                    <span class="k">Last seen</span
+                    ><span class="v" data-bind="lastSeen"
+                      >Koramangala 5th Block</span
+                    ><svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <button class="row" data-sheet="reward">
+                    <span class="k">Reward</span
+                    ><span class="v num"
+                      >&#8377;<span data-bind="reward">5,000</span></span
+                    ><svg class="chev" width="20" height="20">
+                      <use href="#i-chev" />
+                    </svg>
+                  </button>
+                  <div class="row">
+                    <span class="k">Language</span
+                    ><span class="v"
+                      >English + &#3221;&#3240;&#3277;&#3240;&#3233;</span
+                    >
+                  </div>
+                  <div class="row">
+                    <span class="k">Reach</span
+                    ><span class="v">142 owners within 3 km</span>
+                  </div>
+                </div>
+
+                <div
+                  class="em-foot"
+                  style="
+                    background: linear-gradient(
+                      180deg,
+                      rgba(246, 243, 236, 0),
+                      var(--bone) 30%
+                    );
+                  "
+                >
+                  <button class="btn pine" data-sheet="share-poster">
+                    <svg width="19" height="19"><use href="#i-share" /></svg
+                    >Share poster on WhatsApp
+                  </button>
+                </div>
+              </section>
+
+              <!-- ========== COMMUNITY ========== -->
+              <section
+                class="screen has-tabs"
+                id="s-community"
+                data-name="Community"
+                data-tab="chat"
+              >
+                <div class="head-row rise" style="--d: 0">
+                  <h1 class="display">Community</h1>
+                  <button class="pill" data-sheet="ask-question">
+                    <svg width="15" height="15"><use href="#i-plus" /></svg>Ask
+                  </button>
+                </div>
+
+                <div class="post rise" style="--d: 1">
+                  <div class="who">
+                    <span class="avatar" style="background: #efd8d0">P</span
+                    ><b>Priya &middot; Indiranagar &middot; 2h</b>
+                  </div>
+                  <p class="said">
+                    Vet in Indiranagar who is good with anxious cats? Mine
+                    panics in the carrier.
+                  </p>
+                  <div class="acts">
+                    <b>7 answers</b><button data-answer="1">Answer</button>
+                  </div>
+                </div>
+
+                <div class="post rise" style="--d: 2">
+                  <div class="who">
+                    <span class="avatar" style="background: #dce4da">R</span
+                    ><b>Rohan &middot; HSR &middot; 5h</b>
+                  </div>
+                  <div class="photo">
+                    <svg class="pup" viewBox="0 0 240 200">
+                      <use href="#pup-dog" />
+                    </svg>
+                  </div>
+                  <p class="said">First monsoon walk. He hated it.</p>
+                  <div class="acts">
+                    <b>4 replies</b><button data-like="1">Like</button>
+                  </div>
+                </div>
+
+                <div class="post rise" style="--d: 3">
+                  <div class="who">
+                    <span class="avatar" style="background: #efe3c9">M</span
+                    ><b>Meera &middot; Whitefield &middot; 1d</b>
+                  </div>
+                  <p class="said">
+                    Two cats and one dog in a 2BHK &mdash; how do you split
+                    feeding times so nobody steals?
+                  </p>
+                  <div class="acts">
+                    <b>12 answers</b><button data-answer="1">Answer</button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ========== SETTINGS ========== -->
+              <section
+                class="screen"
+                id="s-settings"
+                data-name="Settings &middot; premium"
+                data-tab=""
+              >
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                  <span class="crumb">Aarav</span>
+                </div>
+                <h1 class="display rise" style="--d: 1">Settings</h1>
+
+                <div class="premium rise" style="--d: 2">
+                  <span class="dot"></span>
+                  <p>
+                    Premium adds unlimited assistant history, family sharing and
+                    vet call-backs.
+                  </p>
+                </div>
+
+                <div class="rows rise" style="--d: 3">
+                  <button class="row" data-sheet="language">
+                    <span class="k">Language</span
+                    ><span class="v"
+                      >English &middot; &#3221;&#3240;&#3277;&#3240;&#3233;
+                      &middot; &#2361;&#2367;&#2344;&#2381;&#2342;&#2368;</span
+                    >
+                  </button>
+                  <button class="row" data-sheet="family">
+                    <span class="k">Family sharing</span
+                    ><span class="v">2 people</span>
+                  </button>
+                  <button class="row" data-sheet="reminders">
+                    <span class="k">Reminders</span
+                    ><span class="v">Meals, meds, vaccines</span>
+                  </button>
+                  <button
+                    class="row"
+                    data-toast="Exported Bruno&rsquo;s full history as PDF"
+                  >
+                    <span class="k">Export records</span
+                    ><span class="v">PDF</span>
+                  </button>
+                  <button class="row" data-sheet="contacts">
+                    <span class="k">Emergency contacts</span
+                    ><span class="v">3 saved</span>
+                  </button>
+                </div>
+
+                <p class="eyebrow rise" style="--d: 4; margin-top: 30px">
+                  Notifications
+                </p>
+                <div class="rows rise" style="--d: 4">
+                  <div class="row">
+                    <span class="k" style="color: var(--ink)"
+                      >Care thread alerts</span
+                    ><button
+                      class="switch on"
+                      data-switch
+                      aria-label="Care thread alerts"
+                    ></button>
+                  </div>
+                  <div class="row">
+                    <span class="k" style="color: var(--ink)"
+                      >Weekly summary</span
+                    ><button
+                      class="switch on"
+                      data-switch
+                      aria-label="Weekly summary"
+                    ></button>
+                  </div>
+                  <div class="row">
+                    <span class="k" style="color: var(--ink)"
+                      >Community replies</span
+                    ><button
+                      class="switch"
+                      data-switch
+                      aria-label="Community replies"
+                    ></button>
+                  </div>
+                </div>
+
+                <div class="rise" style="--d: 5; margin-top: 26px">
+                  <button class="btn ghost" data-go="s-signin">Sign out</button>
+                </div>
+              </section>
+            </div>
+            <!-- /screens -->
+
+            <nav class="tabbar hidden" id="tabbar">
+              <button
+                class="tab"
+                data-tab-go="s-home"
+                data-tab-id="home"
+                aria-label="Home"
+              >
+                <svg viewBox="0 0 24 24"><use href="#i-home" /></svg
+                ><span class="pip"></span>
+              </button>
+              <button
+                class="tab"
+                data-tab-go="s-spending"
+                data-tab-id="heart"
+                aria-label="Care and costs"
+              >
+                <svg viewBox="0 0 24 24"><use href="#i-heart" /></svg
+                ><span class="pip"></span>
+              </button>
+              <button
+                class="tab"
+                data-tab-go="s-community"
+                data-tab-id="chat"
+                aria-label="Community"
+              >
+                <svg viewBox="0 0 24 24"><use href="#i-chat" /></svg
+                ><span class="pip"></span>
+              </button>
+              <button
+                class="tab"
+                data-tab-go="s-profile"
+                data-tab-id="person"
+                aria-label="Bruno"
+              >
+                <svg viewBox="0 0 24 24"><use href="#i-person" /></svg
+                ><span class="pip"></span>
+              </button>
+            </nav>
+
+            <div class="home-indicator" id="homeIndicator"></div>
+
+            <!-- bottom sheet: every real action in the app opens one of these -->
+            <div class="scrim" id="scrim"></div>
+            <div
+              class="sheet"
+              id="sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-hidden="true"
+            >
+              <div class="grabber"></div>
+              <div class="sheet-scroll" id="sheetBody"></div>
+            </div>
+
+            <!-- launch -->
+            <div class="boot" id="boot">
+              <svg
+                class="mark"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <ellipse
+                  cx="7.4"
+                  cy="8.6"
+                  rx="2.1"
+                  ry="2.7"
+                  style="--len: 16"
+                />
+                <ellipse cx="12" cy="6.6" rx="2.1" ry="2.8" style="--len: 16" />
+                <ellipse
+                  cx="16.6"
+                  cy="8.6"
+                  rx="2.1"
+                  ry="2.7"
+                  style="--len: 16"
+                />
+                <ellipse
+                  cx="19.3"
+                  cy="13.2"
+                  rx="1.9"
+                  ry="2.4"
+                  style="--len: 14"
+                />
+                <ellipse
+                  cx="4.7"
+                  cy="13.2"
+                  rx="1.9"
+                  ry="2.4"
+                  style="--len: 14"
+                />
+                <path
+                  d="M12 11.4c3.3 0 5.9 2.6 5.9 5.2 0 2.1-1.8 3.4-4 3.4-1 0-1.3-.3-1.9-.3s-.9.3-1.9.3c-2.2 0-4-1.3-4-3.4 0-2.6 2.6-5.2 5.9-5.2z"
+                  style="--len: 30"
+                />
+              </svg>
+              <span class="wordmark">PawPal</span>
+            </div>
+          </div>
+          <!-- /viewport -->
+        </div>
+        <!-- /phone -->
+      </div>
+      <!-- /phone-wrap -->
+
+      <p class="caption">
+        <span class="dot"></span><b id="capName">Sign in</b
+        ><span id="capIdx">1 / 14</span>
+      </p>
+    </div>
+
+    <script src="/pawpal-api.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
