@@ -531,7 +531,24 @@
       </p>
     </aside>
     <p class="nudge" id="nudge">Press <kbd>P</kbd> for the screen list</p>
-    <button id="menuBtn" style="position:fixed;top:10px;left:10px;z-index:101;width:40px;height:40px;border-radius:50%;border:0;background:#17150f;color:#fff;font-size:18px">☰</button>
+    <button
+      id="menuBtn"
+      style="
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 101;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 0;
+        background: #17150f;
+        color: #fff;
+        font-size: 18px;
+      "
+    >
+      ☰
+    </button>
 
     <!-- ============ stage ============ -->
     <div class="stage">
@@ -1045,6 +1062,14 @@
                 data-name="AI Assistant &middot; structured answers"
                 data-tab="chat"
               >
+                <button
+                  class="back"
+                  data-back
+                  aria-label="Back"
+                  style="margin-bottom: 10px"
+                >
+                  <svg width="22" height="22"><use href="#i-back" /></svg>
+                </button>
                 <div class="head-row rise" style="--d: 0">
                   <h1 class="display">Assistant</h1>
                   <button
