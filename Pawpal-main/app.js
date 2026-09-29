@@ -296,7 +296,7 @@
     void el.offsetWidth;
     el.classList.add('settled');
     countUp(el);
-    if (el.id === 's-assistant') runAssistant();
+    
   }
 
   function chrome(id) {
@@ -1202,7 +1202,7 @@
     }).catch(function (err) {
       b.classList.remove('working', 'done');
       b.textContent = label;
-      toast(esc(err.message === 'Failed to fetch' ? 'Cannot reach the server' : err.message));
+      toast(esc(/Failed to fetch|Load failed/.test(err.message) ? 'Cannot reach the server' : err.message));
     });
   }
   $('#signinBtn').addEventListener('click', doSignIn);
@@ -1297,19 +1297,8 @@
      ============================================================ */
 
   var assistantRan = false, assistantT = [];
-  function runAssistant(force) {
-    if (assistantRan && !force) return;
-    assistantRan = true;
-    assistantT.forEach(clearTimeout); assistantT = [];
-    var typing = $('#typing'), answer = $('#answer'), label = $('#assistantLabel');
-    typing.hidden = false; answer.hidden = true; label.hidden = true;
-    assistantT.push(setTimeout(function () {
-      typing.hidden = true; label.hidden = false; answer.hidden = false;
-      $$('#answer .part').forEach(function (p) {
-        p.style.animation = 'none'; void p.offsetWidth; p.style.animation = '';
-      });
-    }, reduced ? 0 : 1500));
-  }
+  
+
 
 
   /* The Assistant talks to the PawPal chatbot service (api.py, POST /chat).
@@ -1495,6 +1484,7 @@
     p.classList.toggle('open', open);
     $('#nudge').style.opacity = open ? 0 : 1;
   }
+  $('#menuBtn').addEventListener('click', function () { togglePresenter(); });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && sheetOpen) { closeSheet(); return; }

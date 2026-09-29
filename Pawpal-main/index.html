@@ -531,6 +531,7 @@
       </p>
     </aside>
     <p class="nudge" id="nudge">Press <kbd>P</kbd> for the screen list</p>
+    <button id="menuBtn" style="position:fixed;top:10px;left:10px;z-index:101;width:40px;height:40px;border-radius:50%;border:0;background:#17150f;color:#fff;font-size:18px">☰</button>
 
     <!-- ============ stage ============ -->
     <div class="stage">
@@ -953,6 +954,11 @@
                 <div class="refresh" id="refresh">
                   <svg width="22" height="22"><use href="#i-paw" /></svg>
                 </div>
+                <div class="navbar rise" style="--d: 0">
+                  <button class="back" data-back aria-label="Back">
+                    <svg width="22" height="22"><use href="#i-back" /></svg>
+                  </button>
+                </div>
 
                 <div class="head-row">
                   <h1 class="display rise" style="--d: 0">
@@ -1038,7 +1044,6 @@
                 id="s-assistant"
                 data-name="AI Assistant &middot; structured answers"
                 data-tab="chat"
-                style="padding-bottom: 178px"
               >
                 <div class="head-row rise" style="--d: 0">
                   <h1 class="display">Assistant</h1>
@@ -1055,59 +1060,7 @@
                   </button>
                 </div>
 
-                <div id="thread-chat">
-                  <div class="bubble-me rise" style="--d: 1">
-                    <span data-bind="They">He</span> has been off
-                    <span data-bind="their">his</span> food since last night and
-                    slept most of today.
-                  </div>
-                  <p
-                    class="eyebrow rise"
-                    style="--d: 2"
-                    id="assistantLabel"
-                    hidden
-                  >
-                    Assistant
-                  </p>
-                  <div class="typing rise" id="typing" style="--d: 2">
-                    <i></i><i></i><i></i>
-                  </div>
-
-                  <div class="card answer" id="answer" hidden>
-                    <div class="part" style="--d: 0">
-                      <p class="eyebrow">What it might be</p>
-                      <p>
-                        Reduced appetite with low energy for under 24 hours is
-                        often a mild stomach upset.
-                        <span data-bind="name">Bruno</span> is also on day 4 of
-                        carprofen, which can put
-                        <span data-bind="speciesPlural">dogs</span> off food.
-                      </p>
-                    </div>
-                    <div class="part" style="--d: 1">
-                      <p class="eyebrow">What to do now</p>
-                      <p>
-                        Offer plain boiled rice and chicken in small portions.
-                        Keep water available and give the 2 pm tablet with food,
-                        not on an empty stomach. Note how much
-                        <span data-bind="they">he</span> eats tonight.
-                      </p>
-                    </div>
-                    <div class="part" style="--d: 2">
-                      <p class="eyebrow">When to see a vet</p>
-                      <p>
-                        If <span data-bind="they">he</span> refuses food for
-                        another 24 hours, vomits more than twice, or the gums
-                        look pale, call Dr. Menon the same day.
-                      </p>
-                    </div>
-                    <div class="part" style="--d: 3">
-                      <button class="btn ghost" data-log-thread="1">
-                        Log this in the thread
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <div id="thread-chat" style="padding-bottom: 16px"></div>
 
                 <div class="composer">
                   <p class="disclaimer">
@@ -2198,6 +2151,9 @@
     </div>
 
     <script src="/pawpal-api.js"></script>
+    <script>
+      window.PAWPAL_CHATBOT = "http://" + location.hostname + ":8000";
+    </script>
     <script src="app.js"></script>
   </body>
 </html>
