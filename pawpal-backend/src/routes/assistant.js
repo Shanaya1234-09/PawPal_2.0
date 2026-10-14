@@ -68,16 +68,36 @@ async function askModel(pet, q) {
    Its KB covers dogs and cats only; other species fall through to the model or script. */
 const asList = (v) => Array.isArray(v) ? list(v) : (v ? [String(v).slice(0, 400)] : []);
 
+let chatbotFailures = 0;
+let circuitOpenUntil = 0;
+
+function recordChatbotFailure() {
+  chatbotFailures++;
+  if (chatbotFailures >= 3) {
+    circuitOpenUntil = Date.now() + 60000;
+  }
+}
+
+function recordChatbotSuccess() {
+  chatbotFailures = 0;
+  circuitOpenUntil = 0;
+}
+
 async function askChatbot(pet, q, history) {
   const base = process.env.CHATBOT_URL;
   if (!base || !['dog', 'cat'].includes(pet.species)) return null;
+  if (Date.now() < circuitOpenUntil) return null;
   try {
     const r = await fetch(base.replace(/\/$/, '') + '/chat', {
       method: 'POST', signal: AbortSignal.timeout(90000), headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ message: q, species: pet.species, pet_name: pet.name, history })
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      recordChatbotFailure();
+      return null;
+    }
     const d = await r.json();
+    recordChatbotSuccess();
     if (d.type === 'urgent') return {
       urgency: 'now',
       mightBe: asList((d.possible_related_conditions || []).slice(0, 4).map((c) => 'Possibly related: ' + c)),
@@ -92,7 +112,10 @@ async function askChatbot(pet, q, history) {
     };
     if (d.type === 'text' && d.message) return { urgency: 'routine', needsMoreInfo: true, reply: String(d.message).slice(0, 600), mightBe: [], whatToDo: [], seeVetWhen: [] };
     return null;
-  } catch (e) { return null; }
+  } catch (e) {
+    recordChatbotFailure();
+    return null;
+  }
 }
 router.post('/:id/assistant', rateLimit({ windowMs: 60e3, limit: 20, standardHeaders: true, legacyHeaders: false }), petAccess('viewer'), async (req, res) => {
   const q = str((req.body || {}).question, 'question', { max: 500 });

@@ -29,6 +29,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import functools
 from symptom_extraction import extract_symptoms, get_symptom_vocab, ExtractionError
 from matching_engine import check_red_flags, match_conditions
 
@@ -81,6 +82,11 @@ def humanize(symptom_key: str) -> str:
 MAX_HISTORY_TURNS = 6  # cap how many past user messages we re-extract from, to bound latency
 
 
+@functools.lru_cache(maxsize=1024)
+def _extract_symptoms_cached(message: str, species: str) -> tuple:
+    return tuple(extract_symptoms(message, species))
+
+
 def gather_symptoms(current_message: str, history: Optional[List[ChatTurn]], species: str) -> List[str]:
     """
     Extracts symptoms from the current message AND accumulates symptoms
@@ -95,7 +101,7 @@ def gather_symptoms(current_message: str, history: Optional[List[ChatTurn]], spe
 
     all_symptoms = set()
     for text in texts:
-        all_symptoms.update(extract_symptoms(text, species))  # raises ExtractionError on failure - let it propagate
+        all_symptoms.update(_extract_symptoms_cached(text, species))  # raises ExtractionError on failure - let it propagate
     return sorted(all_symptoms)
 
 

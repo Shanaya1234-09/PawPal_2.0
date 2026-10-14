@@ -1301,9 +1301,6 @@
 
 
 
-  /* The Assistant talks to the PawPal chatbot service (api.py, POST /chat).
-     Point it elsewhere with  window.PAWPAL_CHATBOT = 'https://...'  before this script. */
-  var CHATBOT = window.PAWPAL_CHATBOT || 'http://localhost:8000';
   var chatHistories = {}, asking = false;
 
   function historyFor(p) {
@@ -1311,9 +1308,19 @@
     return chatHistories[k] || (chatHistories[k] = []);
   }
 
-  function chatScroll() {
+  function chatScroll(target) {
     var s = $('#s-assistant');
-    setTimeout(function () { s.scrollTop = s.scrollHeight; }, 60);
+    if (!s) return;
+    setTimeout(function () {
+      if (target) {
+        var sRect = s.getBoundingClientRect();
+        var elRect = target.getBoundingClientRect();
+        var top = s.scrollTop + (elRect.top - sRect.top) - 16;
+        s.scrollTop = Math.max(0, top);
+      } else {
+        s.scrollTop = s.scrollHeight;
+      }
+    }, 60);
   }
 
   function addMyBubble(text) {
@@ -1347,29 +1354,52 @@
     return card;
   }
 
-  function showChatbotReply(r, p) {
-    if (r.type === 'urgent') {
-      var flags = (r.matched_red_flag_symptoms || []).join(', ');
-      var parts = [{ label: 'Possible emergency', text: p.name + ' may need a vet now. ' + (r.message || '') }];
-      if (flags) { parts.push({ label: 'What triggered this', text: flags }); }
-      addAnswerCard(parts, 'urgent',
-        '<button class="btn" data-go="s-emergency">Open emergency mode</button>');
-      toast('This sounds urgent. Contact a vet now.');
-    } else if (r.type === 'card') {
-      var s = r.sections || {};
-      var cp = [
-        { label: 'What it might be', text: s.what_it_might_be },
-        { label: 'What to do now', text: s.what_to_do },
-        { label: 'When to see a vet', text: s.when_to_see_vet }
-      ];
-      if (r.diet_notes) { cp.push({ label: 'Food', text: r.diet_notes }); }
-      var meta = (r.condition || 'Assistant note') + (r.matched_symptoms && r.matched_symptoms.length
-        ? ' · ' + r.matched_symptoms.join(', ') : '');
-      addAnswerCard(cp, '',
-        '<button class="btn ghost" data-log-thread="1" data-log-meta="' + esc(meta) + '">Log this in the thread</button>');
-    } else {
-      addAnswerCard([{ label: 'Assistant', text: r.message || 'Could you tell me a bit more?' }]);
+  function formatSection(val) {
+    if (!val) return '';
+    if (Array.isArray(val)) {
+      return val.map(function (s) {
+        s = String(s).trim();
+        return (s.slice(-1) === '.' || s.slice(-1) === '!' || s.slice(-1) === '?') ? s : s + '.';
+      }).join(' ');
     }
+    return String(val);
+  }
+
+  function showAssistantReply(r, p) {
+    if (r.reply) {
+      if (r.emergency) {
+        toast('This sounds urgent. Contact a vet now.');
+        return addAnswerCard([
+          { label: 'Possible emergency', text: p.name + ' may need a vet now.' },
+          { label: 'Assistant', text: r.reply }
+        ], 'urgent', '<button class="btn" data-go="s-emergency">Open emergency mode</button>');
+      }
+      return addAnswerCard([{ label: 'Assistant', text: r.reply }]);
+    }
+
+    var cp = [];
+    if (r.emergency) {
+      toast('This sounds urgent. Contact a vet now.');
+      cp.push({ label: 'Possible emergency', text: p.name + ' may need emergency veterinary care right away.' });
+    }
+    if (r.mightBe && (Array.isArray(r.mightBe) ? r.mightBe.length : r.mightBe)) {
+      cp.push({ label: 'What it might be', text: formatSection(r.mightBe) });
+    }
+    if (r.whatToDo && (Array.isArray(r.whatToDo) ? r.whatToDo.length : r.whatToDo)) {
+      cp.push({ label: 'What to do now', text: formatSection(r.whatToDo) });
+    }
+    if (r.seeVetWhen && (Array.isArray(r.seeVetWhen) ? r.seeVetWhen.length : r.seeVetWhen)) {
+      cp.push({ label: 'When to see a vet', text: formatSection(r.seeVetWhen) });
+    }
+
+    if (r.emergency) {
+      return addAnswerCard(cp, 'urgent',
+        '<button class="btn" data-go="s-emergency">Open emergency mode</button>');
+    }
+
+    var meta = (r.condition || 'Assistant note') + (r.source ? ' · ' + r.source : '');
+    return addAnswerCard(cp, '',
+      '<button class="btn ghost" data-log-thread="1" data-log-meta="' + esc(meta) + '">Log this in the thread</button>');
   }
 
   function doAsk() {
@@ -1381,39 +1411,24 @@
     var typing = addTyping();
     chatScroll();
 
-    if (p.species !== 'dog' && p.species !== 'cat') {
-      typing.parentNode.removeChild(typing);
-      addAnswerCard([{ label: 'Assistant', text: 'The chatbot only covers dogs and cats for now. For ' + p.name + ', please check with your vet.' }]);
-      chatScroll();
-      return;
-    }
-
     asking = true;
     var hist = historyFor(p);
     var sent = hist.slice();
     hist.push({ role: 'user', content: v });
 
-    fetch(CHATBOT + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: v, species: p.species, pet_name: p.name, history: sent })
-    }).then(function (res) {
-      if (!res.ok) { throw new Error('The chatbot returned an error (' + res.status + ').'); }
-      return res.json();
-    }).then(function (r) {
+    var petId = p.id || 1;
+    PawPalAPI.assistant(petId, v, sent).then(function (r) {
       typing.parentNode.removeChild(typing);
-      showChatbotReply(r, p);
-      hist.push({ role: 'assistant', content: r.message || r.condition || '' });
+      var card = showAssistantReply(r, p);
+      hist.push({ role: 'assistant', content: r.reply || (r.mightBe && r.mightBe[0]) || r.condition || '' });
+      chatScroll(card);
     }).catch(function (err) {
       typing.parentNode.removeChild(typing);
       hist.pop();
-      var offline = err instanceof TypeError;
-      addAnswerCard([{ label: 'Assistant', text: offline
-        ? 'I could not reach the chatbot. Check that it is running at ' + CHATBOT + ', then send that again.'
-        : err.message }]);
+      var card = addAnswerCard([{ label: 'Assistant', text: err.message || 'I could not reach the assistant. Please try again.' }]);
+      chatScroll(card);
     }).then(function () {
       asking = false;
-      chatScroll();
     });
   }
 
