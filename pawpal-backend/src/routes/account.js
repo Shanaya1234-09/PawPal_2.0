@@ -32,7 +32,12 @@ router.post('/auth/register', (req, res) => {
 
 router.post('/auth/login', (req, res) => {
   const b = req.body || {};
-  const u = db.prepare('SELECT * FROM users WHERE email=?').get(String(b.email || '').trim().toLowerCase());
+  let e;
+  try { e = email(b.email); } catch (err) {
+    if (err instanceof HttpError) throw new HttpError(401, 'Email or password is wrong');
+    throw err;
+  }
+  const u = db.prepare('SELECT * FROM users WHERE email=?').get(e);
   if (!u || !bcrypt.compareSync(String(b.password || ''), u.password_hash)) throw new HttpError(401, 'Email or password is wrong');
   res.json(session(u));
 });

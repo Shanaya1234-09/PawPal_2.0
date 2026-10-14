@@ -7,6 +7,7 @@ const { HttpError, bad, str, num, local } = require('../util');
 const R = petAccess('viewer'), W = petAccess('editor');
 const router = express.Router();      // authenticated, mounted at /api/pets
 const pub = express.Router();         // public, mounted at /api
+router.use(auth);
 
 const km = (a, b, c, d) => {
   const t = (x) => x * Math.PI / 180, h = Math.sin(t(c - a) / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(t(d - b) / 2) ** 2;

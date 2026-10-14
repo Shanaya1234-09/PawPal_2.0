@@ -4,14 +4,43 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const crypto = require('crypto');
 const db = require('./db');
 const { HttpError } = require('./util');
+const logger = require('./logger');
+
+if (!process.env.JWT_SECRET && process.env.NODE_ENV !== 'test') {
+  throw new Error('JWT_SECRET must be set');
+}
 
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false })); // the prototype frontend is inline-heavy
+
 const origins = (process.env.CORS_ORIGIN || '').split(',').map((s) => s.trim()).filter(Boolean);
-app.use(cors({ origin: origins.length ? origins : true }));
+const corsOrigin = origins.length
+  ? (origins.length === 1 ? origins[0] : origins)
+  : (process.env.NODE_ENV === 'production' ? false : true);
+app.use(cors({ origin: corsOrigin }));
+
+app.use((req, res, next) => {
+  const reqId = req.headers['x-request-id'] || crypto.randomUUID();
+  req.id = reqId;
+  res.setHeader('x-request-id', reqId);
+  const start = Date.now();
+  res.on('finish', () => {
+    logger.info('request_completed', {
+      requestId: reqId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      status: res.statusCode,
+      durationMs: Date.now() - start,
+      ip: req.ip
+    });
+  });
+  next();
+});
+
 app.use(express.json({ limit: '100kb' }));
 
 app.get('/api/health', (req, res) => res.json({ ok: true, db: !!db.prepare('SELECT 1 x').get() }));
@@ -35,16 +64,17 @@ if (process.env.FRONTEND_DIR) {
 app.use('/api', (req, res) => res.status(404).json({ error: 'No such endpoint' }));
 
 app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
   if (err instanceof HttpError) return res.status(err.status).json({ error: err.message });
   if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Request body is not valid JSON' });
   if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Request body too large' });
-  console.error(err);
-  res.status(500).json({ error: 'Something went wrong on our side' });
+  logger.error('request_error', { requestId: req && req.id, error: err.message, stack: err.stack });
+  res.status(500).json({ error: 'Something went wrong on our side', requestId: req && req.id });
 });
 
 module.exports = app;
 
 if (require.main === module) {
   const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log('PawPal API listening on http://localhost:' + port));
+  app.listen(port, () => logger.info('PawPal API listening on http://localhost:' + port, { port }));
 }

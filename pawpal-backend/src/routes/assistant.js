@@ -1,7 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const { petAccess } = require('../auth');
-const { str } = require('../util');
+const { auth, petAccess } = require('../auth');
+const { str, ah } = require('../util');
 
 const router = express.Router();
 
@@ -117,7 +117,8 @@ async function askChatbot(pet, q, history) {
     return null;
   }
 }
-router.post('/:id/assistant', rateLimit({ windowMs: 60e3, limit: 20, standardHeaders: true, legacyHeaders: false }), petAccess('viewer'), async (req, res) => {
+router.use(auth);
+router.post('/:id/assistant', rateLimit({ windowMs: 60e3, limit: 20, standardHeaders: true, legacyHeaders: false }), petAccess('viewer'), ah(async (req, res) => {
   const q = str((req.body || {}).question, 'question', { max: 500 });
   const raw = Array.isArray((req.body || {}).history) ? req.body.history : [];
   const history = raw.slice(-12).filter((t) => t && ['user', 'assistant'].includes(t.role) && typeof t.content === 'string')
@@ -135,6 +136,6 @@ router.post('/:id/assistant', rateLimit({ windowMs: 60e3, limit: 20, standardHea
     a.seeVetWhen = ['Go to an open vet hospital now, this can be dangerous, and do not wait for symptoms to show'].concat(a.seeVetWhen).slice(0, 4);
   }
   res.json(Object.assign(a, { source, emergency: a.urgency === 'now', disclaimer: 'Guidance only, not a diagnosis. A vet should see anything that worries you.' }));
-});
+}));
 
 module.exports = router;

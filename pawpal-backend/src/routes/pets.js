@@ -138,7 +138,8 @@ router.patch('/:id/thread/:eid', W, (req, res) => {
   const e = db.prepare('SELECT * FROM thread_entries WHERE id=? AND pet_id=?').get(req.params.eid, req.pet.id);
   if (!e) throw new HttpError(404, 'Entry not found');
   const n = local();
-  if ('done' in req.body) db.prepare('UPDATE thread_entries SET done_at=? WHERE id=?').run(req.body.done ? n.stamp : null, e.id);
+  const b = req.body || {};
+  if ('done' in b) db.prepare('UPDATE thread_entries SET done_at=? WHERE id=?').run(b.done ? n.stamp : null, e.id);
   res.json(entryOut(db.prepare('SELECT * FROM thread_entries WHERE id=?').get(e.id), n.date, n.stamp));
 });
 
@@ -287,7 +288,8 @@ router.post('/:id/family/invite', O, (req, res) => {
 
 router.delete('/:id/family/:uid', O, (req, res) => {
   if (Number(req.params.uid) === req.user.id) throw bad('Owners cannot remove themselves');
-  db.prepare('DELETE FROM pet_members WHERE pet_id=? AND user_id=?').run(req.pet.id, req.params.uid);
+  const info = db.prepare('DELETE FROM pet_members WHERE pet_id=? AND user_id=?').run(req.pet.id, req.params.uid);
+  if (!info.changes) throw new HttpError(404, 'Family member not found');
   res.status(204).end();
 });
 

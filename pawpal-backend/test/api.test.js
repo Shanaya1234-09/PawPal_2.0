@@ -66,6 +66,8 @@ test('access control: strangers cannot see a pet; invited family can', async () 
   assert.equal((await call('POST', '/api/pets/invites/' + inv.token + '/accept', null, b.token)).status, 200);
   assert.equal((await call('GET', '/api/pets/' + petId, null, b.token)).status, 200);
   assert.equal((await call('PATCH', '/api/pets/' + petId, { name: 'X' }, b.token)).status, 403);
+  assert.equal((await call('GET', '/api/pets/not-a-id/thread')).status, 404);
+  assert.equal((await call('DELETE', '/api/pets/' + petId + '/family/99999')).status, 404);
 });
 
 test('community: ask, answer, count', async () => {
