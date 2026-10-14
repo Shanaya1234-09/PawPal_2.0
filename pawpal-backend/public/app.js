@@ -292,11 +292,17 @@
   }
 
   function settle(el, returning) {
-    if (returning) { el.classList.add('settled'); return; }
-    void el.offsetWidth;
-    el.classList.add('settled');
-    countUp(el);
-    
+    if (returning) { el.classList.add('settled'); }
+    else {
+      void el.offsetWidth;
+      el.classList.add('settled');
+      countUp(el);
+    }
+    if (current === 's-home') { loadThread(); }
+    else if (current === 's-vaccines') { loadVaccinations(); }
+    else if (current === 's-spending') { loadSpend(); }
+    else if (current === 's-feeding') { loadFeeding(); }
+    else if (current === 's-growth') { loadWeights(); }
   }
 
   function chrome(id) {
@@ -715,16 +721,32 @@
     },
 
     'book-vax': function () {
-      var slots = ['Thu 28 Aug, 10:00 am', 'Thu 28 Aug, 5:30 pm', 'Fri 29 Aug, 11:15 am'];
+      var d1 = new Date(Date.now() + 864e5);
+      var d2 = new Date(Date.now() + 2 * 864e5);
+
+      var ymd1 = d1.getFullYear() + '-' + ('0' + (d1.getMonth() + 1)).slice(-2) + '-' + ('0' + d1.getDate()).slice(-2);
+      var ymd2 = d2.getFullYear() + '-' + ('0' + (d2.getMonth() + 1)).slice(-2) + '-' + ('0' + d2.getDate()).slice(-2);
+
+      var day1Name = DAYS_SHORT[d1.getDay()] + ' ' + d1.getDate() + ' ' + MONTHS_SHORT[d1.getMonth()];
+      var day2Name = DAYS_SHORT[d2.getDay()] + ' ' + d2.getDate() + ' ' + MONTHS_SHORT[d2.getMonth()];
+
+      var slots = [
+        { label: day1Name + ', 10:00 am', val: ymd1 + ' 10:00' },
+        { label: day1Name + ', 5:30 pm', val: ymd1 + ' 17:30' },
+        { label: day2Name + ', 11:15 am', val: ymd2 + ' 11:15' }
+      ];
+
       return '<h3>Book at Paws Clinic</h3>'
         + '<p class="sub">1.2 km away. Rabies booster, about 15 minutes.</p>'
         + slots.map(function (s, i) {
-          return '<button class="opt' + (i === 1 ? ' on' : '') + '" data-one="slot">' + esc(s)
+          return '<button class="opt' + (i === 0 ? ' on' : '') + '" data-one="slot" data-slot-val="' + s.val + '" data-slot-label="' + esc(s.label) + '">' + esc(s.label)
             + '<span class="tick"><svg width="19" height="19"><use href="#i-check"/></svg></span></button>';
         }).join('')
         + '<button class="btn pine" id="vaxBook">Confirm booking</button>';
     }
   };
+
+  var activeVaxId = null;
 
   function showSheet(name) {
     var fn = SHEETS[name];
@@ -901,16 +923,27 @@
       if (!nn) { $('#n-name').focus(); toast('Give them a name first'); return; }
       var ns = $('#n-species .chip.on');
       var sk = ns ? ns.getAttribute('data-species') : 'dog';
-      PETS.push({
+      var newPet = {
         name: nn, species: sk, breed: 'Not set', sex: 'male',
         age: '1 yr', years: 1, weight: sk === 'dog' ? 12 : 4, since: 'Today',
         allergies: 'None on file', grams: sk === 'dog' ? 260 : 200,
         lastSeen: 'Koramangala 5th Block', reward: '2,000'
-      });
+      };
+      PETS.push(newPet);
       petIndex = PETS.length - 1;
       render();
       closeSheet();
       toast(esc(nn) + ' joined the family');
+
+      PawPalAPI.addPet({
+        name: nn, species: sk, breed: 'Not set', sex: 'male',
+        years: 1, weight: sk === 'dog' ? 12 : 4, grams: sk === 'dog' ? 260 : 200
+      }).then(function (saved) {
+        newPet.id = saved.id;
+        if (saved.weight != null) newPet.weight = saved.weight;
+        if (saved.grams != null) newPet.grams = saved.grams;
+        loadPetData();
+      }).catch(notSaved);
       return;
     }
 
@@ -992,29 +1025,27 @@
     }
 
     if ((t = e.target.closest('#vaxBook'))) {
-      var slot = ($('#sheetBody .opt.on') || {}).textContent || '';
-      var card = $('#s-vaccines .vax-item.due');
-      if (card) {
-        card.classList.remove('due');
-        card.querySelector('.when').textContent = 'Booked';
-        card.querySelector('.node').classList.remove('due');
-        var bb = card.querySelector('.btn');
-        bb.classList.add('pine');
-        bb.innerHTML = '<svg width="19" height="19"><use href="#i-check"/></svg>' + esc(slot.split('·')[0].trim());
-        bb.setAttribute('data-toast', 'Booked at Paws Clinic');
-        bb.removeAttribute('data-sheet');
-      }
-      addThreadEntry('Rabies booster booked', esc(slot) + ' · Paws Clinic');
+      var chosen = $('#sheetBody .opt.on');
+      var slotVal = chosen ? chosen.getAttribute('data-slot-val') : null;
+      var slotLabel = chosen ? (chosen.getAttribute('data-slot-label') || chosen.textContent.trim()) : 'Booked';
+
       closeSheet();
-      if (pet().id) {
-        var si = 0;
-        $$('#sheetBody .opt').forEach(function (o, i) { if (o.classList.contains('on')) si = i; });
-        var when = [[1, '10:00'], [1, '17:30'], [2, '11:15']][si] || [1, '10:00'];
-        var dd = new Date(Date.now() + when[0] * 864e5);
-        var ymd = dd.getFullYear() + '-' + ('0' + (dd.getMonth() + 1)).slice(-2) + '-' + ('0' + dd.getDate()).slice(-2);
-        PawPalAPI.vaccinations(pet().id).then(function (list) {
-          var v = list.filter(function (x) { return x.status === 'due'; })[0];
-          if (v) { return PawPalAPI.bookVaccination(pet().id, v.id, ymd + ' ' + when[1], 'Paws Clinic'); }
+      var p = pet();
+      if (p && p.id && slotVal) {
+        PawPalAPI.vaccinations(p.id).then(function (list) {
+          var targetVax = null;
+          if (activeVaxId) {
+            targetVax = list.filter(function (x) { return String(x.id) === String(activeVaxId); })[0];
+          }
+          if (!targetVax) {
+            targetVax = list.filter(function (x) { return x.status === 'due'; })[0];
+          }
+          if (targetVax) {
+            return PawPalAPI.bookVaccination(p.id, targetVax.id, slotVal, 'Paws Clinic').then(function () {
+              loadVaccinations(p.id);
+              loadThread(p.id);
+            });
+          }
         }).catch(notSaved);
       }
       toast('Booked · added to the care thread');
@@ -1040,7 +1071,13 @@
 
     if ((t = e.target.closest('[data-call]'))) { placeCall(t, t.getAttribute('data-call')); return; }
 
-    if ((t = e.target.closest('[data-sheet]'))) { showSheet(t.getAttribute('data-sheet')); return; }
+    if ((t = e.target.closest('[data-sheet]'))) {
+      if (t.getAttribute('data-sheet') === 'book-vax') {
+        activeVaxId = t.getAttribute('data-vax-id') || null;
+      }
+      showSheet(t.getAttribute('data-sheet'));
+      return;
+    }
     if ((t = e.target.closest('[data-close]'))) {
       if (t.hasAttribute('data-toast')) { toast(t.getAttribute('data-toast')); }
       closeSheet(); return;
@@ -1052,6 +1089,28 @@
       var hs = $('#s-home');
       $$('[data-count]', hs).forEach(function (n) { n.dataset.done = '0'; n.dataset.from = '0'; });
       toast('Showing ' + esc(pet().name) + '’s thread');
+      loadPetData();
+      return;
+    }
+
+    if ((t = e.target.closest('[data-thread-entry-id]'))) {
+      var eid = parseInt(t.getAttribute('data-thread-entry-id'), 10);
+      var wasDone = t.classList.contains('done');
+      var willBeDone = !wasDone;
+      t.classList.toggle('done', willBeDone);
+      t.classList.toggle('due', false);
+      var nd = t.querySelector('.node');
+      if (nd) {
+        nd.classList.toggle('done', willBeDone);
+        nd.classList.toggle('due', false);
+      }
+      PawPalAPI.doneEntry(pet().id, eid, willBeDone).then(function () {
+        toast(willBeDone ? 'Marked done' : 'Marked not done');
+      }).catch(function (err) {
+        t.classList.toggle('done', wasDone);
+        if (nd) nd.classList.toggle('done', wasDone);
+        notSaved(err);
+      });
       return;
     }
 
@@ -1101,6 +1160,36 @@
       return;
     }
     if ((t = e.target.closest('[data-toggle]'))) { t.classList.toggle('on'); return; }
+
+    if ((t = e.target.closest('[data-go="s-signin"]'))) {
+      PawPalAPI.logout();
+      OWNER = 'Aarav';
+      PETS.length = 0;
+      PETS.push(
+        {
+          name: 'Bruno', species: 'dog', breed: 'Indie', sex: 'male',
+          age: '4 yr', years: 4, weight: 18.4, since: 'March 2022',
+          allergies: 'Chicken, dust mites', grams: 360,
+          lastSeen: 'Koramangala 5th Block', reward: '5,000'
+        },
+        {
+          name: 'Mishti', species: 'cat', breed: 'Indian shorthair', sex: 'female',
+          age: '2 yr', years: 2, weight: 4.2, since: 'July 2024',
+          allergies: 'None on file', grams: 230,
+          lastSeen: 'Koramangala 5th Block', reward: '3,000'
+        }
+      );
+      petIndex = 0;
+      chatHistories = {};
+      SPEND.forEach(function (c) { c.value = 0; });
+      stack = [];
+      var emField = $('#email'); if (emField) emField.value = '';
+      var pwField = $('#pw'); if (pwField) pwField.value = '';
+      render();
+      go('s-signin');
+      toast('Signed out');
+      return;
+    }
 
     if ((t = e.target.closest('[data-go]'))) { go(t.getAttribute('data-go')); return; }
     if ((t = e.target.closest('[data-toast]'))) { toast(t.getAttribute('data-toast')); return; }
@@ -1158,16 +1247,44 @@
     petIndex = 0;
     render();
     $$('[data-count]').forEach(function (n) { n.dataset.done = '0'; n.dataset.from = '0'; });
-    loadSpend();
+    loadPetData();
   }
 
   function notSaved(err) { toast(esc('Not saved: ' + (err && err.message ? err.message : 'server error'))); }
 
+  var MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  function formatShortDate(str) {
+    if (!str) return '';
+    var d = new Date(str.indexOf(' ') > -1 ? str.replace(' ', 'T') : str);
+    if (isNaN(d.getTime())) {
+      var parts = str.slice(0, 10).split('-');
+      if (parts.length === 3) {
+        return parts[2] + ' ' + (MONTHS_SHORT[parseInt(parts[1], 10) - 1] || '') + ' ' + parts[0];
+      }
+      return str;
+    }
+    return ('0' + d.getDate()).slice(-2) + ' ' + MONTHS_SHORT[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function formatTime12(str) {
+    if (!str) return '';
+    var timePart = str.indexOf(' ') > -1 ? str.split(' ')[1] : str;
+    var parts = timePart.split(':');
+    var h = parseInt(parts[0], 10);
+    var m = parts[1] || '00';
+    var ampm = h >= 12 ? 'pm' : 'am';
+    var h12 = h % 12 || 12;
+    return h12 + ':' + m + ' ' + ampm;
+  }
+
   /* pull this pet's real spending into the donut */
-  function loadSpend() {
+  function loadSpend(petId) {
     var p = pet();
-    if (!p.id) return;
-    PawPalAPI.spending(p.id).then(function (s) {
+    var pid = petId || (p ? p.id : null);
+    if (!pid) return;
+    PawPalAPI.spending(pid).then(function (s) {
       SPEND.forEach(function (c) {
         var m = s.categories.filter(function (x) { return x.name === c.name; })[0];
         c.value = m ? m.value : 0;
@@ -1175,6 +1292,170 @@
       renderSpend();
       render();
     }).catch(notSaved);
+  }
+
+  function loadThread(petId) {
+    var p = pet();
+    var pid = petId || (p ? p.id : null);
+    if (!pid) return;
+
+    PawPalAPI.thread(pid).then(function (res) {
+      var threadEl = $('#s-home .thread');
+      if (!threadEl) return;
+
+      var entries = res.entries || [];
+      var html = '<span class="rail"></span>';
+      var markerPlaced = false;
+
+      entries.forEach(function (e, idx) {
+        var isDone = e.status === 'done';
+        var isDue = e.status === 'overdue';
+        var isUpcoming = e.status === 'upcoming';
+
+        if (!markerPlaced && isUpcoming) {
+          html += '<div class="now-marker"><span class="node"></span><span>NOW &middot; ' + esc(formatTime12(res.now || new Date().toISOString())) + '</span><span class="line"></span></div>';
+          markerPlaced = true;
+        }
+
+        var tStr = formatTime12(e.at);
+        var subText = isDone ? (tStr + ' · logged') : (isDue ? ('Due ' + tStr + (e.detail ? ' · ' + esc(e.detail) : '')) : (tStr + (e.detail ? ' · ' + esc(e.detail) : '')));
+
+        html += '<button class="entry' + (isDone ? ' done' : (isDue ? ' due' : '')) + '" style="--d: ' + idx + '" data-thread-entry-id="' + e.id + '">';
+        html += '<span class="node' + (isDone ? ' done' : (isDue ? ' due' : '')) + '"></span>';
+        html += '<h4>' + esc(e.title) + (e.detail && isDone ? ' &middot; ' + esc(e.detail) : '') + '</h4>';
+        html += '<p>' + esc(subText) + '</p>';
+        html += '</button>';
+      });
+
+      if (!markerPlaced) {
+        html += '<div class="now-marker"><span class="node"></span><span>NOW &middot; ' + esc(formatTime12(res.now || new Date().toISOString())) + '</span><span class="line"></span></div>';
+      }
+
+      threadEl.innerHTML = html;
+    }).catch(notSaved);
+  }
+
+  function loadFeeding(petId) {
+    var p = pet();
+    var pid = petId || (p ? p.id : null);
+    if (!pid) return;
+
+    PawPalAPI.feeding(pid).then(function (f) {
+      if (f.grams != null) {
+        p.grams = f.grams;
+      }
+      var avoidEl = $('#s-feeding .body');
+      if (avoidEl && f.avoid && f.avoid.length) {
+        avoidEl.textContent = f.avoid.join(', ') + '.';
+      }
+      render();
+    }).catch(notSaved);
+  }
+
+  function loadWeights(petId) {
+    var p = pet();
+    var pid = petId || (p ? p.id : null);
+    if (!pid) return;
+
+    PawPalAPI.weights(pid).then(function (w) {
+      if (w.current != null) {
+        p.weight = w.current;
+      }
+      var growthRows = $('#s-growth .rows');
+      if (growthRows && w.points && w.points.length) {
+        var html = '';
+        var pts = w.points.slice().reverse().slice(0, 5);
+        pts.forEach(function (pt) {
+          var dStr = formatShortDate(pt.loggedAt);
+          html += '<div class="row"><span class="k">' + esc(dStr) + '</span><span class="v num">' + pt.kg.toFixed(1) + ' kg</span></div>';
+        });
+        growthRows.innerHTML = html;
+      }
+      render();
+    }).catch(notSaved);
+  }
+
+  function loadVaccinations(petId) {
+    var p = pet();
+    var pid = petId || (p ? p.id : null);
+    if (!pid) return;
+
+    PawPalAPI.vaccinations(pid).then(function (list) {
+      var timeline = $('#vaxTimeline');
+      var givenRows = $('#vaxGivenRows');
+      var subhead = $('#vaxSubhead');
+      if (!timeline || !givenRows) return;
+
+      var dueOrBooked = [];
+      var given = [];
+      list.forEach(function (v) {
+        if (v.status === 'given') {
+          given.push(v);
+        } else {
+          dueOrBooked.push(v);
+        }
+      });
+
+      if (subhead) {
+        var dueCount = dueOrBooked.filter(function (x) { return x.status === 'due'; }).length;
+        if (dueCount === 0) {
+          subhead.textContent = 'All vaccinations are current.';
+        } else {
+          subhead.textContent = dueCount + (dueCount === 1 ? ' due soon. ' : ' due. ') + 'Everything else is current.';
+        }
+      }
+
+      var html = '<span class="rail"></span>';
+      dueOrBooked.forEach(function (v, idx) {
+        var isDue = v.status === 'due';
+        var isBooked = v.status === 'booked';
+        var dueStr = v.due_date ? formatShortDate(v.due_date).slice(0, 6) : 'Soon';
+        var whenText = isBooked ? 'Booked' : ('Due ' + dueStr);
+
+        html += '<div class="vax-item' + (isDue ? ' due' : '') + '" style="--d: ' + idx + '" data-vax-id="' + v.id + '">';
+        html += '<span class="node' + (isDue ? ' due' : '') + '"></span>';
+        html += '<p class="when">' + esc(whenText) + '</p>';
+        html += '<div class="card">';
+        html += '<h4>' + esc(v.name) + '</h4>';
+        if (isBooked) {
+          var slotText = v.booked_slot ? (formatShortDate(v.booked_slot).slice(0, 6) + ', ' + formatTime12(v.booked_slot)) : 'Booked';
+          html += '<p class="meta">' + esc(v.clinic || 'Paws Clinic') + '</p>';
+          html += '<div style="height: 16px"></div>';
+          html += '<button class="btn pine" data-toast="Booked at ' + esc(v.clinic || 'Paws Clinic') + '">';
+          html += '<svg width="19" height="19"><use href="#i-check"/></svg>' + esc(slotText);
+          html += '</button>';
+        } else {
+          html += '<p class="meta">Annual &middot; scheduled</p>';
+          html += '<div style="height: 16px"></div>';
+          html += '<button class="btn" data-sheet="book-vax" data-vax-id="' + v.id + '">Book at Paws Clinic</button>';
+        }
+        html += '</div></div>';
+      });
+      timeline.innerHTML = html;
+
+      var givenHtml = '';
+      if (given.length === 0) {
+        givenHtml = '<div class="row faded"><span class="k">None on file</span><span class="v">No past records</span></div>';
+      } else {
+        given.forEach(function (v) {
+          var dateStr = v.given_date ? formatShortDate(v.given_date) : (v.due_date ? formatShortDate(v.due_date) : 'Past');
+          givenHtml += '<div class="row"><span class="k">' + esc(dateStr) + '</span><span class="v">' + esc(v.name) + (v.clinic ? ' &middot; ' + esc(v.clinic) : '') + '</span></div>';
+        });
+      }
+      givenRows.innerHTML = givenHtml;
+    }).catch(notSaved);
+  }
+
+  function loadPetData() {
+    var p = pet();
+    if (!p || !p.id) return;
+    loadSpend(p.id);
+    loadThread(p.id);
+    loadFeeding(p.id);
+    loadWeights(p.id);
+    if (current === 's-vaccines') {
+      loadVaccinations(p.id);
+    }
   }
 
   function doSignIn() {
@@ -1465,6 +1746,7 @@
         setTimeout(function () {
           knob.classList.remove('pull', 'spin');
           knob.style.transform = '';
+          loadPetData();
           toast('Care thread up to date');
         }, 1200);
       } else {
