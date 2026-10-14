@@ -25,7 +25,12 @@ app.use('/api/pets', require('./routes/emergency').router);
 app.use('/api/pets', require('./routes/assistant'));
 
 app.get('/pawpal-api.js', (req, res) => res.sendFile(path.join(__dirname, '..', 'pawpal-api.js')));
-if (process.env.FRONTEND_DIR) app.use(express.static(path.resolve(process.env.FRONTEND_DIR)));
+if (process.env.FRONTEND_DIR) {
+  const frontendDir = path.isAbsolute(process.env.FRONTEND_DIR)
+    ? process.env.FRONTEND_DIR
+    : path.resolve(__dirname, '..', process.env.FRONTEND_DIR);
+  app.use(express.static(frontendDir));
+}
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'No such endpoint' }));
 

@@ -4,6 +4,10 @@ services:
     ports:
       - "3000:3000"
     environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_PATH: /data/pawpal.db
+      FRONTEND_DIR: public
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       CHATBOT_URL: http://host.docker.internal:8000
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
